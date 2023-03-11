@@ -8,12 +8,12 @@ import {
   Image,
   SafeAreaView,
   TouchableOpacity,
+  Alert
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
-import { Alert } from "react-native";
 
-export default function Login(navigation) {
+export default function Login( {navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -67,7 +67,7 @@ export default function Login(navigation) {
             <Text style={{ color: "gray", fontWeight: "600", fontSize: 14 }}>
               Don't have an account?{" "}
             </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("Signup")}>
+            <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
               <Text
                 style={{ color: "#f57c00", fontWeight: "600", fontSize: 14 }}
               >
