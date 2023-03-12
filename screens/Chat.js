@@ -67,7 +67,7 @@ import React, {
         setMessages(previousMessages =>
           GiftedChat.append(previousMessages, messages)
         );
-        const { _id, createdAt, text, user } = messages[0];    
+        const { _id, createdAt, text, user } = messages[0];
         addDoc(collection(database, 'chats'), {
           _id,
           createdAt,
