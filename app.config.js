@@ -2,8 +2,9 @@ import 'dotenv/config';
 
 export default {
   "expo": {
+    "owner": "belindus",
     "name": "GameHub",
-    "slug": "GameHub",
+    "slug": "gamehub",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -23,7 +24,9 @@ export default {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.gamehub",
+      "versionCode": 1
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -36,7 +39,7 @@ export default {
       messagingSenderId: process.env.MESSAGING_SENDER_ID,
       appId: process.env.APP_ID,
       eas: {
-        projectId: process.env.EAS_PROJECT_ID
+        projectId: "a53aa06b-341c-484e-b634-f0a001bb1767"
       }
     }
   }
