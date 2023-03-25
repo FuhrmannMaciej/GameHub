@@ -9,6 +9,7 @@ import Chat from "./screens/Chat";
 import Login from './screens/Login';
 import SignUp from './screens/SignUp';
 import Home from './screens/Home';
+import colors from "./colors";
 
 const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
@@ -22,9 +23,15 @@ const AuthenticatedUserProvider = ({ children }) => {
   )
 }
 
-function ChatStack() {
+function HomeStack() {
   return (
-    <Stack.Navigator defaultScreenOptions={Home}>
+    <Stack.Navigator defaultScreenOptions={Home}
+    screenOptions={{
+      headerStyle: {
+        backgroundColor: colors.primary,
+      },
+      headerTitle: '',
+    }}>
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Chat" component={Chat} />
     </Stack.Navigator>
@@ -63,7 +70,7 @@ if (isLoading) {
 
 return (
     <NavigationContainer>
-      {user ? <ChatStack /> : <AuthStack />}
+      {user ? <HomeStack /> : <AuthStack />}
     </NavigationContainer>
   );
 }

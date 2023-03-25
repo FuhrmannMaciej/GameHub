@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
+import colors from "../colors";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
@@ -70,7 +71,7 @@ export default function Login({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#B055D5",
+    backgroundColor: colors.primary,
     justifyContent: "center",
   },
   title: {
@@ -81,7 +82,7 @@ const styles = StyleSheet.create({
     paddingBottom: 44,
   },
   input: {
-    backgroundColor: "#F6F7FB",
+    backgroundColor: colors.mediumGray,
     height: 58,
     marginBottom: 20,
     fontSize: 16,
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   button: {
-    backgroundColor: "#A31EDA",
+    backgroundColor: colors.primaryDark,
     height: 58,
     borderRadius: 10,
     justifyContent: "center",
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   signUpLinkText: {
-    color: "#DEDEDE",
+    color: colors.graySignUp,
     fontWeight: "600",
     fontSize: 16,
   },
