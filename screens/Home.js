@@ -5,7 +5,7 @@ import colors from "../colors";
 import SecondHeader from "../components/SecondHeader";
 import MainHeaderLeft from "../components/MainHeaderLeft";
 import MainHeaderRight from "../components/MainHeaderRight";
-import { Entypo } from "@expo/vector-icons";
+import EntypoIcon from "../components/EntypoIcon";
 
 const Home = () => {
   const navigation = useNavigation();
@@ -31,7 +31,7 @@ const Home = () => {
         <TouchableOpacity style={styles.profilePicture}/>
         <TouchableOpacity style={styles.newPostButton}/>
         <TouchableOpacity style={styles.galleryIcon}>
-          <Entypo name="images" size={28} color={colors.darkGrey} />
+          <EntypoIcon name="images" />
         </TouchableOpacity>
         </View>
 

@@ -1,8 +1,8 @@
 import React, { Component } from "react";
-import { Entypo } from "@expo/vector-icons";
 import colors from "../colors";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import EntypoIcon from "./EntypoIcon";
 
 class MainHeaderRight extends Component {
   render() {
@@ -11,7 +11,7 @@ class MainHeaderRight extends Component {
         onPress={() => this.props.nav.navigate("Chat")}
         style={styles.chatButton}
       >
-        <Entypo name="chat" size={28} color={colors.lightGray} />
+        <EntypoIcon name="chat" color={colors.lightGray} />
       </TouchableOpacity>
     );
   }

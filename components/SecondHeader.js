@@ -1,29 +1,25 @@
 import React, { Component } from "react";
 import { View } from "react-native";
-import { Entypo } from "@expo/vector-icons";
 import colors from "../colors";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
+import EntypoIcon from "./EntypoIcon";
 
 class SecondHeader extends Component {
   render() {
     return (
       <View style={styles.secondHeader}>
         <TouchableOpacity style={styles.icon}>
-          <Entypo name="home" size={28} color={colors.darkGrey} />
+          <EntypoIcon />
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon}>
-          <Entypo name="bell" size={28} color={colors.darkGrey} />
+          <EntypoIcon name="bell" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon}>
-          <Entypo name="users" size={28} color={colors.darkGrey} />
+          <EntypoIcon name="users" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon}>
-          <Entypo
-            name="dots-three-vertical"
-            size={28}
-            color={colors.darkGrey}
-          />
+          <EntypoIcon name="dots-three-vertical" />
         </TouchableOpacity>
       </View>
     );
