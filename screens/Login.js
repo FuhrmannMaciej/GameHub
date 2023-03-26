@@ -3,7 +3,7 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
+  StatusBar,
   TextInput,
   Image,
   SafeAreaView,
@@ -28,6 +28,7 @@ export default function Login({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <StatusBar hidden={true} />
       <View>
         <SafeAreaView>
           <Text style={styles.title}>GameHub</Text>

@@ -4,5 +4,6 @@ export default {
     graySignUp: '#DEDEDE',
     gray: '#C5C5C7',
     mediumGray: '#F6F7FB',
-    lightGray: '#FAFAFA'
+    lightGray: '#FAFAFA',
+    darkGrey: '#8c8c8c'
 };
