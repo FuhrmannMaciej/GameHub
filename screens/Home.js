@@ -68,11 +68,18 @@ const styles = StyleSheet.create({
     marginRight: 15,
   },
   newPostButton: {
-    height: 50,
+    height: 40,
     width: 250,
     borderRadius: 50,
     borderColor: colors.darkGrey,
     borderWidth: 2,
-    marginRight: 15,
   },
+  galleryIcon: {
+      height: 50,
+      width: 50,
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 15,
+      marginLeft: 15,
+    },
 });
