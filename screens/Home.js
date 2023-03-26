@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
 import { View, TouchableOpacity, Text, StatusBar, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { FontAwesome } from "@expo/vector-icons";
 import colors from "../colors";
 import { Entypo } from "@expo/vector-icons";
+import MainHeaderLeft from "../components/MainHeaderLeft";
+import MainHeaderRight from "../components/MainHeaderRight";
 
 const Home = () => {
   const navigation = useNavigation();
@@ -11,28 +12,10 @@ const Home = () => {
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <View style={{ flexDirection: "row" }}>
-          <Entypo
-            name="camera"
-            size={28}
-            color={colors.lightGray}
-            style={styles.camera}
-          />
-          <FontAwesome
-            name="search"
-            size={24}
-            color={colors.lightGray}
-            style={styles.search}
-          />
-        </View>
+        <MainHeaderLeft />
       ),
       headerRight: () => (
-        <TouchableOpacity
-          onPress={() => navigation.navigate("Chat")}
-          style={styles.chatButton}
-        >
-          <Entypo name="chat" size={28} color={colors.lightGray} />
-        </TouchableOpacity>
+        <MainHeaderRight nav={navigation}/>
       ),
     });
   }, [navigation]);
@@ -63,7 +46,7 @@ const Home = () => {
             marginRight: 15,
           }}
         >
-          <FontAwesome name="bell" size={28} color={colors.darkGrey} />
+          <Entypo name="bell" size={28} color={colors.darkGrey} />
         </TouchableOpacity>
         <TouchableOpacity
           style={{
@@ -112,16 +95,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginRight: 15,
-  },
-  camera: {
-    marginLeft: 15,
-  },
-  search: {
-    marginLeft: 15,
-    borderBottomWidth: 2,
-    borderBottomColor: colors.lightGray,
-    paddingBottom: 5,
-    width: 280,
   },
   secondHeader: {
     flexDirection: "row",
