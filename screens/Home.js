@@ -2,9 +2,10 @@ import React, { useEffect } from "react";
 import { View, TouchableOpacity, Text, StatusBar, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import colors from "../colors";
-import { Entypo } from "@expo/vector-icons";
+import SecondHeader from "../components/SecondHeader";
 import MainHeaderLeft from "../components/MainHeaderLeft";
 import MainHeaderRight from "../components/MainHeaderRight";
+import { Entypo } from "@expo/vector-icons";
 
 const Home = () => {
   const navigation = useNavigation();
@@ -25,57 +26,16 @@ const Home = () => {
       <StatusBar
         backgroundColor={colors.primaryDark}
         />
-      <View style={styles.secondHeader}>
-        <TouchableOpacity
-          style={{
-            height: 50,
-            width: 50,
-            alignItems: "center",
-            justifyContent: "center",
-            marginLeft: 15,
-          }}
-        >
-          <Entypo name="home" size={28} color={colors.darkGrey} />
+      <SecondHeader />
+      <View style={styles.newPostSection}>
+        <TouchableOpacity style={styles.profilePicture}/>
+        <TouchableOpacity style={styles.newPostButton}/>
+        <TouchableOpacity style={styles.galleryIcon}>
+          <Entypo name="images" size={28} color={colors.darkGrey} />
         </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            height: 50,
-            width: 50,
-            alignItems: "center",
-            justifyContent: "center",
-            marginRight: 15,
-          }}
-        >
-          <Entypo name="bell" size={28} color={colors.darkGrey} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            height: 50,
-            width: 50,
-            alignItems: "center",
-            justifyContent: "center",
-            marginRight: 15,
-          }}
-        >
-          <Entypo name="users" size={28} color={colors.darkGrey} />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{
-            height: 50,
-            width: 50,
-            alignItems: "center",
-            justifyContent: "center",
-            marginRight: 15,
-          }}
-        >
-          <Entypo
-            name="dots-three-vertical"
-            size={28}
-            color={colors.darkGrey}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={{flex: 1, backgroundColor: 'blue'}} />
+        </View>
+
+
       <View style={{flex: 2, backgroundColor: 'darkorange'}} />
       <View style={{flex: 3, backgroundColor: 'green'}} />
     </View>
@@ -89,21 +49,30 @@ const styles = StyleSheet.create({
     backgroundColor: colors.gray,
     flex: 1,
   },
-  chatButton: {
-    height: 50,
-    width: 50,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 15,
-  },
-  secondHeader: {
+  newPostSection : {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     width: "100%",
     height: "100%",
     backgroundColor: colors.lightGray,
-    flex: 0.7,
-    marginBottom: 5,
+    flex: 1,
+    marginBottom: 7
+  },
+  profilePicture: {
+    height: 50,
+    width: 50,
+    borderRadius: 50,
+    backgroundColor: colors.darkGrey,
+    marginLeft: 15,
+    marginRight: 15,
+  },
+  newPostButton: {
+    height: 50,
+    width: 250,
+    borderRadius: 50,
+    borderColor: colors.darkGrey,
+    borderWidth: 2,
+    marginRight: 15,
   },
 });
