@@ -5,7 +5,6 @@ import {
   View,
   StatusBar,
   TextInput,
-  Image,
   SafeAreaView,
   TouchableOpacity,
   Alert,
