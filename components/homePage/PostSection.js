@@ -14,7 +14,7 @@ class PostSection extends Component {
           <TouchableOpacity style={styles.profilePicture} />
           <View style={styles.postHeaderRight}>
             <Text style={styles.username}>{this.props.username}</Text>
-            <Text style={styles.location}>Location</Text>
+            <Text style={styles.whenPosted}>When</Text>
           </View>
           <TouchableOpacity style={styles.closeButton}>
             <EntypoIcon name="cross" />
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: colors.darkGrey,
   },
-  location: {
+  whenPosted: {
     fontSize: 14,
     color: colors.darkGrey,
   },

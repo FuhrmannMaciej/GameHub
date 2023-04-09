@@ -39,7 +39,7 @@ const Home = () => {
     <View style={styles.container}>
       <StatusBar backgroundColor={colors.primaryDark} />
       <SecondHeader />
-      <NewPostSection />
+      <NewPostSection nav={navigation} />
       <SafeAreaView style={styles.postSectionList}>
         <FlatList style={styles.postSectionList}
           data={DATA}

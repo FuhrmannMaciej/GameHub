@@ -9,6 +9,7 @@ import Chat from "./screens/Chat";
 import Login from './screens/Login';
 import SignUp from './screens/SignUp';
 import Home from './screens/Home';
+import CreateNewPost from './screens/CreateNewPost';
 import colors from "./colors";
 
 const Stack = createStackNavigator();
@@ -34,6 +35,7 @@ function HomeStack() {
     }}>
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Chat" component={Chat} />
+      <Stack.Screen name="CreateNewPost" component={CreateNewPost} />
     </Stack.Navigator>
   )
 }
