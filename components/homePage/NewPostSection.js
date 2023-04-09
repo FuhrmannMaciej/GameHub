@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import colors from "../../colors";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -10,7 +10,9 @@ class NewPostSection extends Component {
     return (
       <View style={styles.newPostSection}>
         <TouchableOpacity style={styles.profilePicture} />
-        <TouchableOpacity style={styles.newPostButton} />
+        <TouchableOpacity style={styles.newPostButton}>
+          <Text style={styles.newPostButtonPlaceholder}>Ready to Tell Your Gamer Tale?</Text>
+        </TouchableOpacity>
         <TouchableOpacity style={styles.galleryIcon}>
           <EntypoIcon name="images" />
         </TouchableOpacity>
@@ -52,6 +54,12 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 15,
     marginLeft: 15,
+  },
+  newPostButtonPlaceholder: {
+    color: colors.darkGrey,
+    fontSize: 14,
+    textAlign: "center",
+    marginTop: 7,
   },
 });
 
