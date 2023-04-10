@@ -1,5 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, StyleSheet, TouchableOpacity, Text, ImageBackground } from "react-native";
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  ImageBackground,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import colors from "../colors";
 import CreateNewPostHeaderLeft from "../components/createNewPostPage/CreateNewPostHeaderLeft";
@@ -19,9 +25,9 @@ const CreateNewPost = () => {
       quality: 1,
     });
 
-    console.log(result);
+    console.log(result.assets);
 
-    if (!result.canceled) {
+    if (result.assets != null) {
       setImage(result.assets[0].uri);
     }
   };
@@ -54,8 +60,10 @@ const CreateNewPost = () => {
         />
         {image && (
           <ImageBackground source={{ uri: image }} style={styles.postImage}>
-            <TouchableOpacity style={styles.closeButton}
-            onPress={() => setImage(null)}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setImage(null)}
+            >
               <EntypoIcon name="cross" color="black" />
             </TouchableOpacity>
           </ImageBackground>
@@ -126,5 +134,5 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     justifyContent: "flex-end",
     marginRight: 15,
-  }
+  },
 });
