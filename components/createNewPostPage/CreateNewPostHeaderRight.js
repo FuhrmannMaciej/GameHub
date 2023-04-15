@@ -1,19 +1,21 @@
-import React, { Component } from "react";
+import React from "react";
 import colors from "../../colors";
 import { StyleSheet, Text } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
-class CreateNewPostHeaderRight extends Component {
-  render() {
+const CreateNewPostHeaderRight = props => {
+
     return (
       <TouchableOpacity
-        onPress={() => this.props.nav.navigate("Home")}
+        onPress={() => {
+          props.uploadPost()
+          props.nav.navigate("Home")
+        }}
         style={styles.postButton}
       >
         <Text style={styles.postButtonText}>POST</Text>
       </TouchableOpacity>
     );
-  }
 }
 
 const styles = StyleSheet.create({

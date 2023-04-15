@@ -13,31 +13,82 @@ import CreateNewPostHeaderRight from "../components/createNewPostPage/CreateNewP
 import { TextInput } from "react-native-gesture-handler";
 import EntypoIcon from "../components/EntypoIcon";
 import * as ImagePicker from "expo-image-picker";
+import { storage } from "../config/firebase";
+import {
+  ref,
+  uploadBytes,
+  getDownloadURL,
+  onStateChanged,
+} from "firebase/storage";
 
 const CreateNewPost = () => {
   const navigation = useNavigation();
 
   const [image, setImage] = useState(null);
 
+  const uploadPost = () => {
+    console.log("Upload post method called");
+    uploadImage();
+  };
+
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
       quality: 1,
     });
+    console.log(result.assets[0].uri);
 
-    console.log(result.assets);
-
-    if (result.assets != null) {
+    if (result.assets[0].uri !== null) {
       setImage(result.assets[0].uri);
     }
   };
 
+  const uploadImage = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        console.log("Image in upload image method: ", image);
+        const xhr = new XMLHttpRequest();
+        xhr.onload = async function () {
+          const blob = xhr.response;
+
+          const storageRef = ref(storage, `postImages/image-${Date.now()}`);
+          const uploadTask = uploadBytes(storageRef, blob);
+
+          uploadTask
+            .then(async (snapshot) => {
+              const url = await getDownloadURL(snapshot.ref);
+              console.log("Download URL: ", url);
+              resolve(url);
+              blob.close();
+            })
+            .catch((error) => {
+              console.log(error);
+              reject(error);
+              blob.close();
+            });
+        };
+        xhr.onerror = function () {
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", image, true);
+        xhr.send(null);
+      } catch (error) {
+        console.log(error);
+        reject(error);
+      }
+    });
+  };
+
   useEffect(() => {
+    console.log("Image in useEffect: ", image);
     navigation.setOptions({
       headerLeft: () => <CreateNewPostHeaderLeft nav={navigation} />,
-      headerRight: () => <CreateNewPostHeaderRight nav={navigation} />,
+      headerRight: () => (
+        <CreateNewPostHeaderRight nav={navigation} uploadPost={uploadPost} />
+      ),
     });
-  }, [navigation]);
+  }, [navigation, image]);
 
   return (
     <View style={styles.container}>
