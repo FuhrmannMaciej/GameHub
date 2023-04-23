@@ -4,7 +4,7 @@ import React, {
     useLayoutEffect,
     useCallback
   } from 'react';
-  import { TouchableOpacity, Text } from 'react-native';
+  import { TouchableOpacity } from 'react-native';
   import { GiftedChat } from 'react-native-gifted-chat';
   import {
     collection,

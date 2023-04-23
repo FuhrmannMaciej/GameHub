@@ -13,22 +13,37 @@ import CreateNewPostHeaderRight from "../components/createNewPostPage/CreateNewP
 import { TextInput } from "react-native-gesture-handler";
 import EntypoIcon from "../components/EntypoIcon";
 import * as ImagePicker from "expo-image-picker";
-import { storage } from "../config/firebase";
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL,
-  onStateChanged,
-} from "firebase/storage";
-
+import { storage, database, auth } from "../config/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { Timestamp, addDoc, collection } from "firebase/firestore";
 const CreateNewPost = () => {
   const navigation = useNavigation();
 
   const [image, setImage] = useState(null);
+  const [text, setText] = useState("");
 
   const uploadPost = () => {
-    console.log("Upload post method called");
-    uploadImage();
+    savePostToDatabase();
+  };
+
+  const savePostToDatabase = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        await uploadImage();
+        addDoc(collection(database, "posts"), {
+          userId: auth.currentUser.uid,
+          textContent: text,
+          imageUrl: image,
+          createdAt: Timestamp.now(),
+        })
+        .then(() => {
+          resolve();
+        })
+      } catch (error) {
+        console.log(error);
+        reject(error);
+      }
+    });
   };
 
   const pickImage = async () => {
@@ -51,7 +66,7 @@ const CreateNewPost = () => {
         xhr.onload = async function () {
           const blob = xhr.response;
 
-          const storageRef = ref(storage, `postImages/image-${Date.now()}`);
+          const storageRef = ref(storage, `postImages/${auth.currentUser.uid}/image-${Timestamp.now()}`);
           const uploadTask = uploadBytes(storageRef, blob);
 
           uploadTask
@@ -108,6 +123,8 @@ const CreateNewPost = () => {
           placeholder="Ready to Tell Your Gamer Tale?"
           placeholderTextColor={colors.darkGrey}
           fontSize={18}
+          onChangeText={(text) => setText(text)}
+          value={text}
         />
         {image && (
           <ImageBackground source={{ uri: image }} style={styles.postImage}>
