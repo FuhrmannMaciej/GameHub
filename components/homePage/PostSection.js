@@ -1,33 +1,43 @@
 import React, { Component } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import colors from "../../colors";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import EntypoIcon from "../EntypoIcon";
 import PostFooter from "./postSection/PostFooter";
+import { useState } from "react";
+import { useLayoutEffect } from "react";
 
-class PostSection extends Component {
-  render() {
+const PostSection = props => {
+  const [imageUrl, setImageUrl] = useState("");
+
+  useLayoutEffect(() => {
+    if (props.imagePath) {
+      setImageUrl(props.imagePath);
+      console.log("imagePath: ", props.imagePath);
+    }
+  }, [props.imagePath]);
+
     return (
       <View style={styles.container}>
         <View style={styles.postHeader}>
           <TouchableOpacity style={styles.profilePicture} />
           <View style={styles.postHeaderRight}>
-            <Text style={styles.username}>{this.props.username}</Text>
-            <Text style={styles.whenPosted}>When</Text>
+            <Text style={styles.username}>{props.username}</Text>
+            <Text style={styles.whenPosted}>{props.whenPosted}</Text>
           </View>
           <TouchableOpacity style={styles.closeButton}>
             <EntypoIcon name="cross" />
           </TouchableOpacity>
         </View>
         <View style={styles.postContent}>
-          <Text>Image here</Text>
+          <Text style={styles.postText}>{props.textContent}</Text>
+          <Image source={imageUrl} />
         </View>
-        <PostFooter />
+        <PostFooter likes={props.likes} comments={props.comments} />
       </View>
     );
   }
-}
 
 const styles = StyleSheet.create({
   container: {
@@ -67,7 +77,12 @@ const styles = StyleSheet.create({
   },
   postContent: {
     flex: 3,
-    backgroundColor: colors.primary,
+  },
+  postText: {
+    fontSize: 16,
+    color: colors.darkGrey,
+    marginLeft: 20,
+    marginTop: 20,
   },
   closeButton: {
     height: 40,

@@ -21,6 +21,7 @@ const CreateNewPost = () => {
 
   const [image, setImage] = useState(null);
   const [text, setText] = useState("");
+  let imagePath = "";
 
   const uploadPost = () => {
     savePostToDatabase();
@@ -30,11 +31,12 @@ const CreateNewPost = () => {
     return new Promise(async (resolve, reject) => {
       try {
         await uploadImage();
-        addDoc(collection(database, "posts"), {
-          userId: auth.currentUser.uid,
+        addDoc(collection(database, `gamers/${auth.currentUser.uid}/posts`), {
           textContent: text,
-          imageUrl: image,
+          imagePath: imagePath,
           createdAt: Timestamp.now(),
+          likes: 0,
+          comments: 0
         })
         .then(() => {
           resolve();
@@ -66,7 +68,8 @@ const CreateNewPost = () => {
         xhr.onload = async function () {
           const blob = xhr.response;
 
-          const storageRef = ref(storage, `postImages/${auth.currentUser.uid}/image-${Timestamp.now()}`);
+          imagePath = `postImages/${auth.currentUser.uid}/image-${Timestamp.now()}`;
+          const storageRef = ref(storage, imagePath);
           const uploadTask = uploadBytes(storageRef, blob);
 
           uploadTask

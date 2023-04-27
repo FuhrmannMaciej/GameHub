@@ -12,10 +12,10 @@ class PostFooter extends Component {
         <View style={styles.postFooterTop}>
           <View style={styles.postLikes}>
             <EntypoIcon name="heart" color="red" style={styles.likeIcon} />
-            <Text style={styles.likesCount}>40</Text>
+            <Text style={styles.likesCount}>{this.props.likes}</Text>
           </View>
           <View style={styles.postComments}>
-            <Text style={styles.commentsCount}>10</Text>
+            <Text style={styles.commentsCount}>{this.props.comments}</Text>
             <Text style={styles.comments}>comments</Text>
           </View>
         </View>

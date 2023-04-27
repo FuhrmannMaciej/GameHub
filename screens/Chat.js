@@ -90,7 +90,7 @@ import React, {
             borderRadius: 20,
           }}
           user={{
-            _id: auth?.currentUser?.email,
+            _id: auth?.currentUser?.uid,
             avatar: 'https://i.pravatar.cc/300'
           }}
         />
