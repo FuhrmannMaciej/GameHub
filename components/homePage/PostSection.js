@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React from "react";
 import { View, Text, Image } from "react-native";
 import colors from "../../colors";
 import { StyleSheet } from "react-native";
@@ -6,38 +6,44 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import EntypoIcon from "../EntypoIcon";
 import PostFooter from "./postSection/PostFooter";
 import { useState } from "react";
-import { useLayoutEffect } from "react";
+import { ref, getDownloadURL } from "firebase/storage";
+import { storage } from "../../config/firebase";
+import { useEffect } from "react";
 
-const PostSection = props => {
+const PostSection = (props) => {
   const [imageUrl, setImageUrl] = useState("");
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (props.imagePath) {
-      setImageUrl(props.imagePath);
-      console.log("imagePath: ", props.imagePath);
-    }
-  }, [props.imagePath]);
+      const storageRef = ref(storage, props.imagePath);
 
-    return (
-      <View style={styles.container}>
-        <View style={styles.postHeader}>
-          <TouchableOpacity style={styles.profilePicture} />
-          <View style={styles.postHeaderRight}>
-            <Text style={styles.username}>{props.username}</Text>
-            <Text style={styles.whenPosted}>{props.whenPosted}</Text>
-          </View>
-          <TouchableOpacity style={styles.closeButton}>
-            <EntypoIcon name="cross" />
-          </TouchableOpacity>
+      getDownloadURL(storageRef).then((url) => {
+        if (url === "") return;
+        setImageUrl(url);
+      });
+    }
+  }, [imageUrl]);
+
+  return (
+    <View style={styles.container}>
+      <View style={styles.postHeader}>
+        <TouchableOpacity style={styles.profilePicture} />
+        <View style={styles.postHeaderRight}>
+          <Text style={styles.username}>{props.username}</Text>
+          <Text style={styles.whenPosted}>{props.whenPosted}</Text>
         </View>
-        <View style={styles.postContent}>
-          <Text style={styles.postText}>{props.textContent}</Text>
-          <Image source={imageUrl} />
-        </View>
-        <PostFooter likes={props.likes} comments={props.comments} />
+        <TouchableOpacity style={styles.closeButton}>
+          <EntypoIcon name="cross" />
+        </TouchableOpacity>
       </View>
-    );
-  }
+      <View style={styles.postContent}>
+        {props.textContent && (<Text style={styles.postText}>{props.textContent}</Text>)}
+        {imageUrl && (<Image style={styles.postImage} source={{uri: imageUrl}} />)}
+      </View>
+      <PostFooter likes={props.likes} comments={props.comments} />
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -83,6 +89,8 @@ const styles = StyleSheet.create({
     color: colors.darkGrey,
     marginLeft: 20,
     marginTop: 20,
+    marginRight: 20,
+    marginBottom: 20,
   },
   closeButton: {
     height: 40,
@@ -91,7 +99,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 15,
     marginLeft: 15,
-  }
+  },
+  postImage: {
+    flex: 1,
+    resizeMode: "cover",
+  },
 });
 
 export default PostSection;

@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, StatusBar, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import colors from "../colors";
@@ -21,11 +21,10 @@ const Home = () => {
       headerLeft: () => <MainHeaderLeft />,
       headerRight: () => <MainHeaderRight nav={navigation} />,
     });
-  }, [navigation]);
 
-  useLayoutEffect(() => {
-    const gamersRef = collection(database, "gamers");
-    const q = query(gamersRef);
+    navigation.addListener('focus', () => {
+      const gamersRef = collection(database, "gamers");
+      const q = query(gamersRef);
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const postsArray = [];
@@ -36,6 +35,7 @@ const Home = () => {
         onSnapshot(q, (querySnapshotPosts) => {
           querySnapshotPosts.forEach((docPosts) => {
             const dataPosts = docPosts.data();
+            if (docPosts.id === postsArray._id) return; //todo check if this works
             postsArray.push({
               _id: docPosts.id,
               firstName: data.firstName,
@@ -56,7 +56,8 @@ const Home = () => {
     return () => {
       unsubscribe();
     };
-  }, []);
+  });
+  }, [navigation]);
 
   return (
     <View style={styles.container}>
@@ -65,8 +66,8 @@ const Home = () => {
       <NewPostSection nav={navigation} />
       <SafeAreaView style={styles.postSectionList}>
         <FlatList
-          style={styles.postSectionList}
           data={posts}
+          ItemSeparatorComponent={() => <View style={{height: 5, backgroundColor: colors.gray}} />}
           renderItem={({ item }) =>
           <PostSection username={item.firstName + " " + item.lastName} whenPosted={item.createdAt.toLocaleString()}
           textContent={item.textContent} imagePath={item.imagePath} likes={item.likes} comments={item.comments}
