@@ -6,7 +6,6 @@ import {
   Text,
   ImageBackground,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import colors from "../colors";
 import CreateNewPostHeaderLeft from "../components/createNewPostPage/CreateNewPostHeaderLeft";
 import CreateNewPostHeaderRight from "../components/createNewPostPage/CreateNewPostHeaderRight";
@@ -16,8 +15,7 @@ import * as ImagePicker from "expo-image-picker";
 import { storage, database, auth } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Timestamp, addDoc, collection } from "firebase/firestore";
-const CreateNewPost = () => {
-  const navigation = useNavigation();
+const CreateNewPost = ({navigation}) => {
 
   const [image, setImage] = useState(null);
   const [text, setText] = useState("");

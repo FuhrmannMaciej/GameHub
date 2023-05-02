@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { View, StatusBar, StyleSheet } from "react-native";
-import { useNavigation } from "@react-navigation/native";
 import colors from "../colors";
 import SecondHeader from "../components/SecondHeader";
 import MainHeaderLeft from "../components/MainHeaderLeft";
@@ -12,9 +11,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { database } from "../config/firebase";
 
-const Home = () => {
+const Home = ({navigation}) => {
   const [posts, setPosts] = useState([]);
-  const navigation = useNavigation();
 
   useEffect(() => {
     navigation.setOptions({
@@ -35,7 +33,7 @@ const Home = () => {
         onSnapshot(q, (querySnapshotPosts) => {
           querySnapshotPosts.forEach((docPosts) => {
             const dataPosts = docPosts.data();
-            if (docPosts.id === postsArray._id) return; //todo check if this works
+            if (docPosts.id === postsArray._id) return;
             postsArray.push({
               _id: docPosts.id,
               firstName: data.firstName,
