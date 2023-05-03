@@ -9,7 +9,9 @@ class SecondHeader extends Component {
   render() {
     return (
       <View style={styles.secondHeader}>
-        <TouchableOpacity style={styles.icon}>
+        <TouchableOpacity style={styles.icon}
+        onPress={() => 
+        this.props.nav.navigate("Home")}>
           <EntypoIcon />
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon}>

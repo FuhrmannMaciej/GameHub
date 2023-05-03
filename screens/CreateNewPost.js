@@ -58,10 +58,20 @@ const CreateNewPost = ({navigation}) => {
     }
   };
 
+  
+  const handleTextInputChange = async (text) => {
+    if (text.length > 0) {
+      setText(text);
+    }
+  };
+
   const uploadImage = () => {
     return new Promise(async (resolve, reject) => {
       try {
         console.log("Image in upload image method: ", image);
+        if (image === null) {
+          resolve(null);
+        }
         const xhr = new XMLHttpRequest();
         xhr.onload = async function () {
           const blob = xhr.response;
@@ -97,14 +107,13 @@ const CreateNewPost = ({navigation}) => {
   };
 
   useEffect(() => {
-    console.log("Image in useEffect: ", image);
     navigation.setOptions({
       headerLeft: () => <CreateNewPostHeaderLeft nav={navigation} />,
       headerRight: () => (
         <CreateNewPostHeaderRight nav={navigation} uploadPost={uploadPost} />
       ),
     });
-  }, [navigation, image]);
+  }, [navigation, image, text]);
 
   return (
     <View style={styles.container}>
@@ -124,7 +133,7 @@ const CreateNewPost = ({navigation}) => {
           placeholder="Ready to Tell Your Gamer Tale?"
           placeholderTextColor={colors.darkGrey}
           fontSize={18}
-          onChangeText={(text) => setText(text)}
+          onChangeText={handleTextInputChange}
           value={text}
         />
         {image && (
