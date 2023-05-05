@@ -13,7 +13,6 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
 import colors from "../colors";
 
-
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +38,6 @@ export default function Login({ navigation }) {
             autoCapitalize="none"
             keyboardType="email-address"
             textContentType="emailAddress"
-            autoFocus={true}
             value={email}
             onChangeText={(text) => setEmail(text)}
           />
@@ -60,7 +58,7 @@ export default function Login({ navigation }) {
             </Text>
           </TouchableOpacity>
           <View style={styles.signUpLink}>
-            <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+            <TouchableOpacity onPress={() => navigation.navigate("SignUpStepOne")}>
               <Text style={styles.signUpLinkText}> sign up for GameHub</Text>
             </TouchableOpacity>
           </View>

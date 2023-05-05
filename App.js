@@ -7,7 +7,8 @@ import { auth } from './config/firebase';
 
 import Chat from "./screens/Chat";
 import Login from './screens/Login';
-import SignUp from './screens/SignUp';
+import SignUpStepOne from './screens/SignUpStepOne';
+import SignUpStepTwo from './screens/SignUpStepTwo';
 import Home from './screens/Home';
 import CreateNewPost from './screens/CreateNewPost';
 import colors from "./colors";
@@ -44,7 +45,8 @@ function AuthStack() {
   return (
     <Stack.Navigator defaultScreenOptions={Login}>
       <Stack.Screen name='Login' component={Login} options={{ headerShown: false}}/>
-      <Stack.Screen name='SignUp' component={SignUp} />
+      <Stack.Screen name='SignUpStepOne' component={SignUpStepOne} options={{ headerShown: false}}/>
+      <Stack.Screen name='SignUpStepTwo' component={SignUpStepTwo} options={{ headerShown: false}}/>
     </Stack.Navigator>
   );
 }
