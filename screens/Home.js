@@ -82,6 +82,7 @@ export async function generatePostsList(setPosts) {
 
     for (const docPosts of querySnapshotPosts.docs) {
       const dataPosts = docPosts.data();
+      if (docPosts.id === postsArray._id) return;
       postsArray.push({
         _id: docPosts.id,
         firstName: data.firstName,

@@ -12,6 +12,7 @@ import SignUpStepTwo from './screens/SignUpStepTwo';
 import Home from './screens/Home';
 import CreateNewPost from './screens/CreateNewPost';
 import colors from "./colors";
+import SetAvatar from "./screens/SetAvatar";
 
 const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
@@ -47,6 +48,7 @@ function AuthStack() {
       <Stack.Screen name='Login' component={Login} options={{ headerShown: false}}/>
       <Stack.Screen name='SignUpStepOne' component={SignUpStepOne} options={{ headerShown: false}}/>
       <Stack.Screen name='SignUpStepTwo' component={SignUpStepTwo} options={{ headerShown: false}}/>
+      <Stack.Screen name='SetAvatar' component={SetAvatar} options={{ headerShown: false}}/>
     </Stack.Navigator>
   );
 }

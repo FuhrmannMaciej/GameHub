@@ -7,9 +7,11 @@ import {
   SafeAreaView,
   TouchableOpacity,
   Platform,
+  LogBox,
 } from "react-native";
 import colors from "../colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
+
 
 export default function SignUpStepOne({ navigation }) {
   const [firstName, setFirstName] = useState("");
@@ -21,6 +23,10 @@ export default function SignUpStepOne({ navigation }) {
   const onHandleSignup = () => {
     navigation.navigate("SignUpStepTwo", { firstName, lastName, dateOfBirth });
   };
+
+  LogBox.ignoreLogs([
+    'Non-serializable values were found in the navigation state',
+  ]);
 
   const onChange = (event, selectedDate) => {
     const currentDate = selectedDate || dateOfBirth;
@@ -37,7 +43,7 @@ export default function SignUpStepOne({ navigation }) {
     <View style={styles.container}>
       <View style={styles.whiteSheet} />
       <SafeAreaView style={styles.form}>
-        <Text style={styles.title}>Sign Up</Text>
+        <Text style={styles.title}>GameHub</Text>
         <TextInput
           style={styles.input}
           placeholder="first name"
@@ -62,7 +68,7 @@ export default function SignUpStepOne({ navigation }) {
           )}
             {showPlaceholder && (
             <Text style={{ color: colors.darkGrey, fontSize: 15, marginTop: 5 }}>
-              date of birth
+            date of birth
             </Text>
           )}
           {showDatePicker && (
