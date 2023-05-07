@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     backgroundColor: colors.lightGray,
-    flex: 0.8,
+    flex: 0.6,
     marginBottom: 7,
   },
   profilePicture: {

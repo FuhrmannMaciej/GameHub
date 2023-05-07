@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
     backgroundColor: colors.lightGray,
-    flex: 0.6,
+    flex: 0.4,
     marginBottom: 2,
   },
   icon: {
