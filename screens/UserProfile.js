@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { View, StatusBar, StyleSheet, RefreshControl } from "react-native";
+import { View, StatusBar, StyleSheet } from "react-native";
 import colors from "../colors";
 import SecondHeader from "../components/SecondHeader";
 import MainHeaderLeft from "../components/MainHeaderLeft";
@@ -8,27 +8,24 @@ import NewPostSection from "../components/homePage/NewPostSection";
 import PostSection from "../components/homePage/PostSection";
 import { FlatList } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy } from "firebase/firestore";
 import { database } from "../config/firebase";
 import { getDocs } from "firebase/firestore";
 
-const Home = ({ navigation }) => {
+const UserProfile = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await generatePostsList(setPosts);
-    setRefreshing(false);
-  }, []);
 
   useEffect(() => {
     navigation.setOptions({
       headerLeft: () => <MainHeaderLeft />,
       headerRight: () => <MainHeaderRight nav={navigation} />,
     });
+      generatePostsList(setPosts);
 
-    generatePostsList(setPosts);
+      navigation.addListener("focus", () => {
+        generatePostsList(setPosts);
+      });
+
   }, [navigation]);
 
   return (
@@ -54,16 +51,13 @@ const Home = ({ navigation }) => {
           )}
           keyExtractor={(item) => item._id}
           extraData={posts}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-          }
         />
       </SafeAreaView>
     </View>
   );
 };
 
-export default Home;
+export default UserProfile;
 
 const styles = StyleSheet.create({
   container: {
@@ -101,6 +95,7 @@ export async function generatePostsList(setPosts) {
       });
     }
   }
+
   setPosts(postsArray);
 }
 
