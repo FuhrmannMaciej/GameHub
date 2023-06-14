@@ -8,7 +8,7 @@ import NewPostSection from "../components/homePage/NewPostSection";
 import PostSection from "../components/homePage/PostSection";
 import { FlatList } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy } from "firebase/firestore";
 import { database } from "../config/firebase";
 import { getDocs } from "firebase/firestore";
 
@@ -103,39 +103,3 @@ export async function generatePostsList(setPosts) {
   }
   setPosts(postsArray);
 }
-
-
-// export function generatePostsList(setPosts) {
-//   const gamersRef = collection(database, "gamers");
-//   const q = query(gamersRef);
-
-//   const unsubscribe = onSnapshot(q, (querySnapshot) => {
-//     const postsArray = [];
-//     querySnapshot.forEach((doc) => {
-//       const data = doc.data();
-//       const postsRef = collection(database, `gamers/${doc.id}/posts`);
-//       const q = query(postsRef, orderBy("createdAt", "desc"));
-//       onSnapshot(q, (querySnapshotPosts) => {
-//         querySnapshotPosts.forEach((docPosts) => {
-//           const dataPosts = docPosts.data();
-//           if (docPosts.id === postsArray._id) return;
-//           postsArray.push({
-//             _id: docPosts.id,
-//             firstName: data.firstName,
-//             lastName: data.lastName,
-//             textContent: dataPosts.textContent,
-//             createdAt: dataPosts.createdAt.toDate(),
-//             imagePath: dataPosts.imagePath,
-//             likes: dataPosts.likes,
-//             comments: dataPosts.comments,
-//           });
-//         });
-//       });
-//     });
-//     setPosts(postsArray);
-//   });
-
-//   return () => {
-//     unsubscribe();
-//   };
-// }

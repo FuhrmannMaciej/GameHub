@@ -9,7 +9,8 @@ class NewPostSection extends Component {
   render() {
     return (
       <View style={styles.newPostSection}>
-        <TouchableOpacity style={styles.profilePicture} />
+        <TouchableOpacity style={styles.profilePicture} 
+        onPress={() => this.props.nav.navigate("UserProfile")}/>
         <TouchableOpacity style={styles.newPostButton}
         onPress={() => this.props.nav.navigate("CreateNewPost")}>
           <Text style={styles.newPostButtonPlaceholder}>Ready to Tell Your Gamer Tale?</Text>

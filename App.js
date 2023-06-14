@@ -13,6 +13,7 @@ import Home from './screens/Home';
 import CreateNewPost from './screens/CreateNewPost';
 import colors from "./colors";
 import SetAvatar from "./screens/SetAvatar";
+import UserProfile from "./screens/UserProfile";
 
 const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
@@ -38,6 +39,7 @@ function HomeStack() {
       <Stack.Screen name="Home" component={Home} />
       <Stack.Screen name="Chat" component={Chat} />
       <Stack.Screen name="CreateNewPost" component={CreateNewPost} />
+      <Stack.Screen name="UserProfile" component={UserProfile} />
     </Stack.Navigator>
   )
 }
