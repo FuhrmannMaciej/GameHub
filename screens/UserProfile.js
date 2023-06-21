@@ -9,9 +9,14 @@ import { doc, getDoc } from "firebase/firestore";
 import { database } from "../config/firebase";
 import { useState } from "react";
 import { format } from "date-fns";
+import * as ImagePicker from "expo-image-picker";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../config/firebase";
+import { ImageBackground } from "react-native";
 
 const UserProfile = ({ navigation }) => {
   const [userInfo, setUserInfo] = useState(null);
+  const [avatar, setAvatar] = useState(null);
 
   useEffect(() => {
     navigation.setOptions({
@@ -34,17 +39,76 @@ const UserProfile = ({ navigation }) => {
     fetchUserInfo();
   }, []);
 
+  const pickAvatar = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      quality: 1,
+    });
+    console.log(result.assets[0].uri);
+
+    if (result.assets[0].uri !== null) {
+      setAvatar(result.assets[0].uri).then(() => {
+        uploadAvatar();
+      });
+    }
+  };
+
+  const uploadAvatar = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        console.log("Image in upload avatar method: ", avatar);
+        if (avatar === null) {
+          resolve(null);
+        }
+        const xhr = new XMLHttpRequest();
+        xhr.onload = async function () {
+          const blob = xhr.response;
+
+          avatarPath = `avatars/${auth.currentUser.uid}`;
+          const storageRef = ref(storage, avatarPath);
+          const uploadTask = uploadBytes(storageRef, blob);
+
+          uploadTask
+            .then(async (snapshot) => {
+              const url = await getDownloadURL(snapshot.ref);
+              console.log("Download URL: ", url);
+              resolve(url);
+              blob.close();
+            })
+            .catch((error) => {
+              console.log(error);
+              reject(error);
+              blob.close();
+            });
+        };
+        xhr.onerror = function () {
+          reject(new TypeError("Network request failed"));
+        };
+        xhr.responseType = "blob";
+        xhr.open("GET", avatar, true);
+        xhr.send(null);
+      } catch (error) {
+        console.log(error);
+        reject(error);
+      }
+    });
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={colors.primaryDark} />
-      <View style={styles.profileCover}>
-        <Image style={styles.profileCoverImage} />
-      </View>
       <View style={styles.profileContainer}>
-        <TouchableOpacity style={styles.profilePicture}>
-          <Image style={styles.profileImage} />
+        <TouchableOpacity style={styles.profilePicture} onPress={pickAvatar}>
+          {avatar && (
+            <ImageBackground
+              source={{ uri: avatar }}
+              style={styles.avatarImage}
+            />
+          )}
         </TouchableOpacity>
-        <Text style={styles.userName}>{userInfo?.firstName} {userInfo?.lastName}</Text>
+        <Text style={styles.userName}>
+          {userInfo?.firstName} {userInfo?.lastName}
+        </Text>
         <View style={styles.chatAndSettings}>
           <TouchableOpacity style={styles.chatButton}>
             <EntypoIcon name="chat" color={colors.darkGrey} />
@@ -57,7 +121,11 @@ const UserProfile = ({ navigation }) => {
           <Text style={styles.userInfoText}>
             Email: {auth.currentUser.email}
           </Text>
-          <Text style={styles.userInfoText}>Date of Birth: {userInfo?.dateOfBirth && format(userInfo.dateOfBirth, "MM/dd/yyyy")}</Text>
+          <Text style={styles.userInfoText}>
+            Date of Birth:{" "}
+            {userInfo?.dateOfBirth &&
+              format(userInfo.dateOfBirth, "MM/dd/yyyy")}
+          </Text>
         </View>
       </View>
     </View>
@@ -71,11 +139,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightGray,
     flex: 1,
   },
-  profileCover: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: colors.gray,
-  },
   profileContainer: {
     flex: 2,
     justifyContent: "center",
@@ -84,16 +147,9 @@ const styles = StyleSheet.create({
   profilePicture: {
     height: 150,
     width: 150,
-    borderRadius: 80,
-    backgroundColor: colors.darkGrey,
     marginLeft: 15,
     marginRight: 15,
-  },
-  profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    marginBottom: 20,
+    backgroundColor: colors.darkGrey,
   },
   chatAndSettings: {
     flexDirection: "row",
@@ -120,5 +176,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: colors.darkGray,
     marginBottom: 10,
+  },
+  closeButton: {
+    height: 40,
+    width: 40,
+    alignItems: "flex-end",
+    justifyContent: "flex-end",
+    marginRight: 15,
+  },
+  avatarImage: {
+    width: "100%",
+    height: "100%",
+    alignItems: "flex-end",
   },
 });

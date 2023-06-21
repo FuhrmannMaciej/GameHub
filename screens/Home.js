@@ -44,6 +44,7 @@ const Home = ({ navigation }) => {
           )}
           renderItem={({ item }) => (
             <PostSection
+              id={item._id}
               username={item.firstName + " " + item.lastName}
               whenPosted={item.createdAt.toLocaleString()}
               textContent={item.textContent}
@@ -84,7 +85,9 @@ export async function generatePostsList(setPosts) {
   for (const doc of querySnapshot.docs) {
     const data = doc.data();
     const postsRef = collection(database, `gamers/${doc.id}/posts`);
-    const querySnapshotPosts = await getDocs(query(postsRef, orderBy("createdAt", "desc")));
+    const querySnapshotPosts = await getDocs(
+      query(postsRef, orderBy("createdAt", "desc"))
+    );
 
     for (const docPosts of querySnapshotPosts.docs) {
       const dataPosts = docPosts.data();

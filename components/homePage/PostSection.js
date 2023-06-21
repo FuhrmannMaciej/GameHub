@@ -12,6 +12,7 @@ import { useEffect } from "react";
 
 const PostSection = (props) => {
   const [imageUrl, setImageUrl] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
     if (props.imagePath) {
@@ -24,10 +25,36 @@ const PostSection = (props) => {
     }
   }, [imageUrl]);
 
+  useEffect(() => {
+    if (props.imagePath) {
+      const imagePath = props.imagePath;
+      const parts = imagePath.split("/");
+      const id = parts[1];
+      const storageRef = ref(storage, `avatars/${id}`);
+  
+      getDownloadURL(storageRef)
+        .then((url) => {
+          if (url !== "") {
+            setAvatarUrl(url);
+          } else {
+            console.log("Storage image reference does not exist.");
+          }
+        })
+        .catch((error) => {
+          console.log("Error occurred while checking storage image reference:", error);
+        });
+      }
+  }, [avatarUrl]);
+  
+
   return (
     <View style={styles.container}>
       <View style={styles.postHeader}>
-        <TouchableOpacity style={styles.profilePicture} />
+        <TouchableOpacity style={styles.profilePicture}>
+        {avatarUrl && (
+          <Image style={styles.postImage} source={{ uri: avatarUrl }} />
+        )}
+        </TouchableOpacity>
         <View style={styles.postHeaderRight}>
           <Text style={styles.username}>{props.username}</Text>
           <Text style={styles.whenPosted}>{props.whenPosted}</Text>
@@ -37,8 +64,12 @@ const PostSection = (props) => {
         </TouchableOpacity>
       </View>
       <View style={styles.postContent}>
-        {props.textContent && (<Text style={styles.postText}>{props.textContent}</Text>)}
-        {imageUrl && (<Image style={styles.postImage} source={{uri: imageUrl}} />)}
+        {props.textContent && (
+          <Text style={styles.postText}>{props.textContent}</Text>
+        )}
+        {imageUrl && (
+          <Image style={styles.postImage} source={{ uri: imageUrl }} />
+        )}
       </View>
       <PostFooter likes={props.likes} comments={props.comments} />
     </View>
@@ -53,10 +84,11 @@ const styles = StyleSheet.create({
   profilePicture: {
     height: 50,
     width: 50,
-    borderRadius: 50,
+    borderRadius: 25,
     backgroundColor: colors.darkGrey,
     marginLeft: 15,
     marginRight: 15,
+    overflow: "hidden",
   },
   postHeader: {
     flexDirection: "row",
