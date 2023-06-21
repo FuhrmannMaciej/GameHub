@@ -4,15 +4,40 @@ import colors from "../../colors";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import EntypoIcon from "../EntypoIcon";
+import { auth } from "../../config/firebase";
+import { useState, useEffect } from "react";
+import { ref, getDownloadURL } from "firebase/storage";
+import { storage } from "../../config/firebase";
+import { Image } from "react-native";
 
-class NewPostSection extends Component {
-  render() {
+const NewPostSection = (props) => {
+  const [avatarUrl, setAvatarUrl] = useState("");
+
+  useEffect(() => {
+      const storageRef = ref(storage, `avatars/${auth.currentUser.uid}`);
+  
+      getDownloadURL(storageRef)
+        .then((url) => {
+          if (url !== "") {
+            setAvatarUrl(url);
+          } else {
+            console.log("Storage image reference does not exist.");
+          }
+        })
+        .catch((error) => {
+          console.log("Error occurred while checking storage image reference:", error);
+        });
+  }, [avatarUrl]);
+  
     return (
       <View style={styles.newPostSection}>
-        <TouchableOpacity style={styles.profilePicture} 
-        onPress={() => this.props.nav.navigate("UserProfile")}/>
+        <TouchableOpacity style={styles.profilePicture} onPress={() => props.nav.navigate("UserProfile")}>
+        {avatarUrl && (
+          <Image style={styles.profileImage} source={{ uri: avatarUrl }} />
+        )}
+        </TouchableOpacity>
         <TouchableOpacity style={styles.newPostButton}
-        onPress={() => this.props.nav.navigate("CreateNewPost")}>
+        onPress={() => props.nav.navigate("CreateNewPost")}>
           <Text style={styles.newPostButtonPlaceholder}>Ready to Tell Your Gamer Tale?</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.galleryIcon}>
@@ -20,7 +45,6 @@ class NewPostSection extends Component {
         </TouchableOpacity>
       </View>
     );
-  }
 }
 
 const styles = StyleSheet.create({
@@ -37,10 +61,11 @@ const styles = StyleSheet.create({
   profilePicture: {
     height: 50,
     width: 50,
-    borderRadius: 50,
+    borderRadius: 25,
     backgroundColor: colors.darkGrey,
     marginLeft: 15,
     marginRight: 15,
+    overflow: "hidden",
   },
   newPostButton: {
     height: 40,
@@ -62,6 +87,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: "center",
     marginTop: 7,
+  },
+  profileImage: {
+    flex: 1,
+    resizeMode: "cover",
   },
 });
 

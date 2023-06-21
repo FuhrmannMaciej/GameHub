@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   Text,
   ImageBackground,
+  Image,
 } from "react-native";
 import colors from "../colors";
 import CreateNewPostHeaderLeft from "../components/createNewPostPage/CreateNewPostHeaderLeft";
@@ -14,12 +15,31 @@ import EntypoIcon from "../components/EntypoIcon";
 import * as ImagePicker from "expo-image-picker";
 import { storage, database, auth } from "../config/firebase";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { Timestamp, addDoc, collection } from "firebase/firestore";
+import { Timestamp, addDoc, collection, doc, getDoc } from "firebase/firestore";
+
 const CreateNewPost = ({navigation}) => {
 
   const [image, setImage] = useState(null);
   const [text, setText] = useState("");
   let imagePath = "";
+  const [avatarUrl, setAvatarUrl] = useState("");
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+      const storageRef = ref(storage, `avatars/${auth.currentUser.uid}`);
+  
+      getDownloadURL(storageRef)
+        .then((url) => {
+          if (url !== "") {
+            setAvatarUrl(url);
+          } else {
+            console.log("Storage image reference does not exist.");
+          }
+        })
+        .catch((error) => {
+          console.log("Error occurred while checking storage image reference:", error);
+        });
+  }, [avatarUrl]);
 
   const uploadPost = () => {
     savePostToDatabase();
@@ -115,12 +135,30 @@ const CreateNewPost = ({navigation}) => {
     });
   }, [navigation, image, text]);
 
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userId = auth.currentUser.uid;
+      const userRef = doc(database, "gamers", userId);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setUserInfo({ ...userData });
+      }
+    };
+
+    fetchUserInfo();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.postHeader}>
-        <TouchableOpacity style={styles.profilePicture} />
+      <TouchableOpacity style={styles.profilePicture}>
+        {avatarUrl && (
+          <Image style={styles.profileImage} source={{ uri: avatarUrl }} />
+        )}
+        </TouchableOpacity>
         <View style={styles.postHeaderRight}>
-          <Text style={styles.username}>Username</Text>
+          <Text style={styles.username}>{userInfo?.firstName} {userInfo?.lastName}</Text>
         </View>
         <TouchableOpacity style={styles.galleryButton} onPress={pickImage}>
           <EntypoIcon name="images" />
@@ -161,10 +199,11 @@ const styles = StyleSheet.create({
   profilePicture: {
     height: 50,
     width: 50,
-    borderRadius: 50,
+    borderRadius: 25,
     backgroundColor: colors.darkGrey,
     marginLeft: 15,
     marginRight: 15,
+    overflow: "hidden",
   },
   postHeader: {
     flexDirection: "row",
@@ -212,5 +251,9 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     justifyContent: "flex-end",
     marginRight: 15,
+  },
+  profileImage: {
+    flex: 1,
+    resizeMode: "cover",
   },
 });

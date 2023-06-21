@@ -39,6 +39,11 @@ const UserProfile = ({ navigation }) => {
     fetchUserInfo();
   }, []);
 
+  useEffect(() => {
+    if (avatar === null) return;
+    uploadAvatar();
+  }, [avatar]);
+
   const pickAvatar = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.All,
@@ -47,9 +52,7 @@ const UserProfile = ({ navigation }) => {
     console.log(result.assets[0].uri);
 
     if (result.assets[0].uri !== null) {
-      setAvatar(result.assets[0].uri).then(() => {
-        uploadAvatar();
-      });
+      setAvatar(result.assets[0].uri);
     }
   };
 
