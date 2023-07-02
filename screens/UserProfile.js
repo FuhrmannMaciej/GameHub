@@ -16,7 +16,7 @@ import { ImageBackground } from "react-native";
 
 const UserProfile = ({ navigation }) => {
   const [userInfo, setUserInfo] = useState(null);
-  const [avatar, setAvatar] = useState(null);
+  const [avatar, setAvatar] = useState("");
 
   useEffect(() => {
     navigation.setOptions({
@@ -36,11 +36,19 @@ const UserProfile = ({ navigation }) => {
       }
     };
 
+    const fetchAvatar = async () => {
+      const avatarPath = `avatars/${auth.currentUser.uid}`;
+      const storageRef = ref(storage, avatarPath);
+      const url = await getDownloadURL(storageRef);
+      setAvatar(url);
+    };
+
     fetchUserInfo();
+    fetchAvatar();
   }, []);
 
   useEffect(() => {
-    if (avatar === null) return;
+    if (avatar === "") return;
     uploadAvatar();
   }, [avatar]);
 
@@ -102,7 +110,7 @@ const UserProfile = ({ navigation }) => {
       <StatusBar backgroundColor={colors.primaryDark} />
       <View style={styles.profileContainer}>
         <TouchableOpacity style={styles.profilePicture} onPress={pickAvatar}>
-          {avatar && (
+        {avatar !== "" && (
             <ImageBackground
               source={{ uri: avatar }}
               style={styles.avatarImage}

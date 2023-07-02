@@ -14,20 +14,15 @@ const NewPostSection = (props) => {
   const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
-      const storageRef = ref(storage, `avatars/${auth.currentUser.uid}`);
-  
-      getDownloadURL(storageRef)
-        .then((url) => {
-          if (url !== "") {
-            setAvatarUrl(url);
-          } else {
-            console.log("Storage image reference does not exist.");
-          }
-        })
-        .catch((error) => {
-          console.log("Error occurred while checking storage image reference:", error);
-        });
-  }, [avatarUrl]);
+    const fetchAvatar = async () => {
+      const avatarPath = `avatars/${auth.currentUser.uid}`;
+      const storageRef = ref(storage, avatarPath);
+      const url = await getDownloadURL(storageRef);
+      setAvatarUrl(url);
+    };
+
+    fetchAvatar();
+  }, []);
   
     return (
       <View style={styles.newPostSection}>

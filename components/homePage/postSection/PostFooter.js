@@ -6,13 +6,26 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import EntypoIcon from "../../EntypoIcon";
 
 class PostFooter extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      likes: this.props.likes,
+    };
+  }
+
+  handleLike = () => {
+    this.setState((prevState) => ({
+      likes: prevState.likes + 1,
+    }));
+  };
+
   render() {
     return (
       <View style={styles.postFooter}>
         <View style={styles.postFooterTop}>
           <View style={styles.postLikes}>
             <EntypoIcon name="heart" color="red" style={styles.likeIcon} />
-            <Text style={styles.likesCount}>{this.props.likes}</Text>
+            <Text style={styles.likesCount}>{this.state.likes}</Text>
           </View>
           <View style={styles.postComments}>
             <Text style={styles.commentsCount}>{this.props.comments}</Text>
@@ -20,7 +33,10 @@ class PostFooter extends Component {
           </View>
         </View>
         <View style={styles.postFooterBottom}>
-          <TouchableOpacity style={styles.postFooterButton}>
+          <TouchableOpacity
+            style={styles.postFooterButton}
+            onPress={this.handleLike}
+          >
             <EntypoIcon name="thumbs-up" />
             <Text style={styles.postFooterButtonText}>Like</Text>
           </TouchableOpacity>
