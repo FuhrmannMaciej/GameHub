@@ -12,7 +12,6 @@ import { useEffect } from "react";
 
 const PostSection = (props) => {
   const [imageUrl, setImageUrl] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
 
   useEffect(() => {
     if (props.imagePath) {
@@ -21,39 +20,18 @@ const PostSection = (props) => {
       getDownloadURL(storageRef).then((url) => {
         if (url === "") return;
         setImageUrl(url);
+        console.log(props.postAvatarUrl);
       });
     }
   }, [imageUrl]);
-
-  useEffect(() => {
-    if (props.imagePath) {
-      const imagePath = props.imagePath;
-      const parts = imagePath.split("/");
-      const id = parts[1];
-      const storageRef = ref(storage, `avatars/${id}`);
-  
-      getDownloadURL(storageRef)
-        .then((url) => {
-          if (url !== "") {
-            setAvatarUrl(url);
-          } else {
-            console.log("Storage image reference does not exist.");
-          }
-        })
-        .catch((error) => {
-          console.log("Error occurred while checking storage image reference:", error);
-        });
-      }
-  }, [avatarUrl]);
-  
 
   return (
     <View style={styles.container}>
       <View style={styles.postHeader}>
         <TouchableOpacity style={styles.profilePicture}>
-        {avatarUrl && (
-          <Image style={styles.postImage} source={{ uri: avatarUrl }} />
-        )}
+          {props.postAvatarUrl && (
+            <Image style={styles.postImage} source={{ uri: props.postAvatarUrl }} />
+          )}
         </TouchableOpacity>
         <View style={styles.postHeaderRight}>
           <Text style={styles.username}>{props.username}</Text>

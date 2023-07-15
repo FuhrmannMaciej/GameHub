@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, StatusBar, StyleSheet, Text, Image } from "react-native";
+import { View, StatusBar, StyleSheet, Text } from "react-native";
 import colors from "../colors";
 import UserProfileHeader from "../components/UserProfileHeader";
 import { TouchableOpacity } from "react-native-gesture-handler";

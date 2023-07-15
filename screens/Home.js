@@ -11,10 +11,45 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { collection, query, orderBy } from "firebase/firestore";
 import { database } from "../config/firebase";
 import { getDocs } from "firebase/firestore";
+import { auth } from "../config/firebase";
+import { ref, getDownloadURL } from "firebase/storage";
+import { storage } from "../config/firebase";
 
 const Home = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
   const [refreshing, setRefreshing] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState("");
+
+  const fetchAvatar = async () => {
+    const avatarPath = `avatars/${auth.currentUser.uid}`;
+    const storageRef = ref(storage, avatarPath);
+    const url = await getDownloadURL(storageRef);
+    setAvatarUrl(url);
+  };
+
+  const fetchPostAvatar = async (imagePath) => {
+    if (imagePath) {
+      const parts = imagePath.split("/");
+      const id = parts[1];
+      const storageRef = ref(storage, `avatars/${id}`);
+
+      try {
+        const url = await getDownloadURL(storageRef);
+        return url || ""; // Return empty string if URL is not available
+      } catch (error) {
+        console.error("Error fetching post avatar:", error);
+      }
+    }
+    return ""; // Return empty string if no image path is provided
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchAvatar();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -35,24 +70,36 @@ const Home = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar backgroundColor={colors.primaryDark} />
       <SecondHeader nav={navigation} />
-      <NewPostSection nav={navigation} />
+      <NewPostSection nav={navigation} avatarUrl={avatarUrl} />
       <SafeAreaView style={styles.postSectionList}>
         <FlatList
           data={posts}
           ItemSeparatorComponent={() => (
             <View style={{ height: 5, backgroundColor: colors.gray }} />
           )}
-          renderItem={({ item }) => (
-            <PostSection
-              id={item._id}
-              username={item.firstName + " " + item.lastName}
-              whenPosted={item.createdAt.toLocaleString()}
-              textContent={item.textContent}
-              imagePath={item.imagePath}
-              likes={item.likes}
-              comments={item.comments}
-            />
-          )}
+          renderItem={({ item }) => {
+            const [postAvatarUrl, setPostAvatarUrl] = useState("");
+
+            useEffect(() => {
+              fetchPostAvatar(item.imagePath)
+                .then((url) => setPostAvatarUrl(url))
+                .catch((error) =>
+                  console.error("Error fetching post avatar:", error)
+                );
+            }, [item.imagePath]);
+            return (
+              <PostSection
+                id={item._id}
+                username={item.firstName + " " + item.lastName}
+                whenPosted={item.createdAt.toLocaleString()}
+                textContent={item.textContent}
+                imagePath={item.imagePath}
+                likes={item.likes}
+                comments={item.comments}
+                postAvatarUrl={postAvatarUrl}
+              />
+            );
+          }}
           keyExtractor={(item) => item._id}
           extraData={posts}
           refreshControl={

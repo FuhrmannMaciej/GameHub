@@ -1,34 +1,18 @@
-import React, { Component } from "react";
+import React from "react";
 import { View, Text } from "react-native";
 import colors from "../../colors";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import EntypoIcon from "../EntypoIcon";
-import { auth } from "../../config/firebase";
-import { useState, useEffect } from "react";
-import { ref, getDownloadURL } from "firebase/storage";
-import { storage } from "../../config/firebase";
 import { Image } from "react-native";
 
 const NewPostSection = (props) => {
-  const [avatarUrl, setAvatarUrl] = useState("");
-
-  useEffect(() => {
-    const fetchAvatar = async () => {
-      const avatarPath = `avatars/${auth.currentUser.uid}`;
-      const storageRef = ref(storage, avatarPath);
-      const url = await getDownloadURL(storageRef);
-      setAvatarUrl(url);
-    };
-
-    fetchAvatar();
-  }, []);
   
     return (
       <View style={styles.newPostSection}>
         <TouchableOpacity style={styles.profilePicture} onPress={() => props.nav.navigate("UserProfile")}>
-        {avatarUrl && (
-          <Image style={styles.profileImage} source={{ uri: avatarUrl }} />
+        {props.avatarUrl && (
+          <Image style={styles.profileImage} source={{ uri: props.avatarUrl }} />
         )}
         </TouchableOpacity>
         <TouchableOpacity style={styles.newPostButton}
