@@ -13,6 +13,7 @@ import { useEffect } from "react";
 const PostSection = (props) => {
   const [imageUrl, setImageUrl] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [userId, setUserId] = useState("");
 
   useEffect(() => {
     if (props.imagePath) {
@@ -29,8 +30,7 @@ const PostSection = (props) => {
     if (props.imagePath) {
       const imagePath = props.imagePath;
       const parts = imagePath.split("/");
-      const id = parts[1];
-      const storageRef = ref(storage, `avatars/${id}`);
+      const storageRef = ref(storage, `avatars/${parts[1]}`);
   
       getDownloadURL(storageRef)
         .then((url) => {
@@ -70,7 +70,7 @@ const PostSection = (props) => {
           <Image style={styles.postImage} source={{ uri: imageUrl }} />
         )}
       </View>
-      <PostFooter likes={props.likes} comments={props.comments} />
+      <PostFooter likes={props.likes} comments={props.comments} postId={props.id} imagePath={props.imagePath}/>
     </View>
   );
 };

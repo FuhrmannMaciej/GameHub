@@ -4,8 +4,9 @@ import colors from "../../../colors";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import EntypoIcon from "../../EntypoIcon";
-import { Modal } from "react-native";
 import { TextInput } from "react-native";
+import { database } from "../../../config/firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 class PostFooter extends Component {
   constructor(props) {
@@ -24,19 +25,35 @@ class PostFooter extends Component {
   };
 
   toggleCommentModal = () => {
-  this.setState((prevState) => ({
-    commentModalVisible: !prevState.commentModalVisible,
-  }), () => {
-    console.log("Comment modal visible:", this.state.commentModalVisible);
-  });
-};
+    this.setState(
+      (prevState) => ({
+        commentModalVisible: !prevState.commentModalVisible,
+      }),
+      () => {
+        console.log("Comment modal visible:", this.state.commentModalVisible);
+      }
+    );
+  };
   handleCommentTextChange = (text) => {
     this.setState({ commentText: text });
   };
 
   submitComment = () => {
     const { commentText } = this.state;
-    console.log("Submitted comment:", commentText);
+    const { imagePath } = this.props;
+    
+      const parts = imagePath.split("/");
+
+    addDoc(collection(database, `gamers/${parts[1]}/posts/${this.props.postId}/comments`) , {
+        textContent: commentText,
+      })
+      .then((docRef) => {
+        console.log("Comment added with ID: ", docRef.id);
+      })
+      .catch((error) => {
+        console.error("Error adding comment: ", error);
+      });
+
     this.setState({ commentText: "" });
     this.toggleCommentModal();
   };
@@ -51,13 +68,13 @@ class PostFooter extends Component {
     return (
       <View style={styles.commentModalContainer}>
         <View style={styles.commentModalContent}>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.commentInput}
-            placeholder="Enter your comment"
-            value={commentText}
-            onChangeText={this.handleCommentTextChange}
-          />
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.commentInput}
+              placeholder="Enter your comment"
+              value={commentText}
+              onChangeText={this.handleCommentTextChange}
+            />
           </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
@@ -79,7 +96,6 @@ class PostFooter extends Component {
   }
 
   render() {
-    
     return (
       <View style={styles.postFooter}>
         <View style={styles.postFooterTop}>
@@ -100,8 +116,10 @@ class PostFooter extends Component {
             <EntypoIcon name="thumbs-up" />
             <Text style={styles.postFooterButtonText}>Like</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.postFooterButton}
-           onPress={this.toggleCommentModal}>
+          <TouchableOpacity
+            style={styles.postFooterButton}
+            onPress={this.toggleCommentModal}
+          >
             <EntypoIcon name="message" />
             <Text style={styles.postFooterButtonText}>Comment</Text>
           </TouchableOpacity>

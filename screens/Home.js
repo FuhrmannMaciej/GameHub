@@ -27,22 +27,6 @@ const Home = ({ navigation }) => {
     setAvatarUrl(url);
   };
 
-  const fetchPostAvatar = async (imagePath) => {
-    if (imagePath) {
-      const parts = imagePath.split("/");
-      const id = parts[1];
-      const storageRef = ref(storage, `avatars/${id}`);
-
-      try {
-        const url = await getDownloadURL(storageRef);
-        return url || ""; // Return empty string if URL is not available
-      } catch (error) {
-        console.error("Error fetching post avatar:", error);
-      }
-    }
-    return ""; // Return empty string if no image path is provided
-  };
-
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       fetchAvatar();
