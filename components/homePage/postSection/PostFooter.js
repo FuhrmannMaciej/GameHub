@@ -4,12 +4,16 @@ import colors from "../../../colors";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import EntypoIcon from "../../EntypoIcon";
+import { Modal } from "react-native";
+import { TextInput } from "react-native";
 
 class PostFooter extends Component {
   constructor(props) {
     super(props);
     this.state = {
       likes: this.props.likes,
+      commentModalVisible: false,
+      commentText: "",
     };
   }
 
@@ -19,7 +23,63 @@ class PostFooter extends Component {
     }));
   };
 
+  toggleCommentModal = () => {
+  this.setState((prevState) => ({
+    commentModalVisible: !prevState.commentModalVisible,
+  }), () => {
+    console.log("Comment modal visible:", this.state.commentModalVisible);
+  });
+};
+  handleCommentTextChange = (text) => {
+    this.setState({ commentText: text });
+  };
+
+  submitComment = () => {
+    const { commentText } = this.state;
+    console.log("Submitted comment:", commentText);
+    this.setState({ commentText: "" });
+    this.toggleCommentModal();
+  };
+
+  renderCommentModal() {
+    const { commentModalVisible, commentText } = this.state;
+
+    if (!commentModalVisible) {
+      return null;
+    }
+
+    return (
+      <View style={styles.commentModalContainer}>
+        <View style={styles.commentModalContent}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.commentInput}
+            placeholder="Enter your comment"
+            value={commentText}
+            onChangeText={this.handleCommentTextChange}
+          />
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={this.submitComment}
+            >
+              <Text style={styles.submitButtonText}>Submit</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={this.toggleCommentModal}
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   render() {
+    
     return (
       <View style={styles.postFooter}>
         <View style={styles.postFooterTop}>
@@ -40,7 +100,8 @@ class PostFooter extends Component {
             <EntypoIcon name="thumbs-up" />
             <Text style={styles.postFooterButtonText}>Like</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.postFooterButton}>
+          <TouchableOpacity style={styles.postFooterButton}
+           onPress={this.toggleCommentModal}>
             <EntypoIcon name="message" />
             <Text style={styles.postFooterButtonText}>Comment</Text>
           </TouchableOpacity>
@@ -49,6 +110,8 @@ class PostFooter extends Component {
             <Text style={styles.postFooterButtonText}>Send</Text>
           </TouchableOpacity>
         </View>
+
+        {this.renderCommentModal()}
       </View>
     );
   }
@@ -125,6 +188,61 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.darkGrey,
     marginRight: 5,
+  },
+  commentModalContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  commentModalContent: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 5,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  commentInput: {
+    height: 40,
+    width: "100%",
+    borderColor: "gray",
+    borderWidth: 1,
+    marginBottom: 10,
+    paddingHorizontal: 10,
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  submitButton: {
+    backgroundColor: "green",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  submitButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+  cancelButton: {
+    backgroundColor: "red",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  cancelButtonText: {
+    color: "white",
+    fontWeight: "bold",
+    textAlign: "center",
   },
 });
 
