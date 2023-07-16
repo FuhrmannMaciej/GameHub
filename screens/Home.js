@@ -66,6 +66,20 @@ const Home = ({ navigation }) => {
     generatePostsList(setPosts);
   }, [navigation]);
 
+  const renderPostSection = ({ item }) => {
+            return (
+              <PostSection
+                id={item._id}
+                username={item.firstName + " " + item.lastName}
+                whenPosted={item.createdAt.toLocaleString()}
+                textContent={item.textContent}
+                imagePath={item.imagePath}
+                likes={item.likes}
+                comments={item.comments}
+              />
+            );
+          };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={colors.primaryDark} />
@@ -77,29 +91,7 @@ const Home = ({ navigation }) => {
           ItemSeparatorComponent={() => (
             <View style={{ height: 5, backgroundColor: colors.gray }} />
           )}
-          renderItem={({ item }) => {
-            const [postAvatarUrl, setPostAvatarUrl] = useState("");
-
-            useEffect(() => {
-              fetchPostAvatar(item.imagePath)
-                .then((url) => setPostAvatarUrl(url))
-                .catch((error) =>
-                  console.error("Error fetching post avatar:", error)
-                );
-            }, [item.imagePath]);
-            return (
-              <PostSection
-                id={item._id}
-                username={item.firstName + " " + item.lastName}
-                whenPosted={item.createdAt.toLocaleString()}
-                textContent={item.textContent}
-                imagePath={item.imagePath}
-                likes={item.likes}
-                comments={item.comments}
-                postAvatarUrl={postAvatarUrl}
-              />
-            );
-          }}
+          renderItem={renderPostSection}
           keyExtractor={(item) => item._id}
           extraData={posts}
           refreshControl={
