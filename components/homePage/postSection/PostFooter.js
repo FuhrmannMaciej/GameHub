@@ -6,7 +6,7 @@ import { TouchableOpacity } from "react-native-gesture-handler";
 import EntypoIcon from "../../EntypoIcon";
 import { TextInput } from "react-native";
 import { database } from "../../../config/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 
 class PostFooter extends Component {
   constructor(props) {
@@ -15,8 +15,14 @@ class PostFooter extends Component {
       likes: this.props.likes,
       commentModalVisible: false,
       commentText: "",
+      commentsCount: 0,
     };
   }
+
+  componentDidMount() {
+    this.countComments();
+  }
+
 
   handleLike = () => {
     this.setState((prevState) => ({
@@ -49,6 +55,7 @@ class PostFooter extends Component {
       })
       .then((docRef) => {
         console.log("Comment added with ID: ", docRef.id);
+        this.countComments();
       })
       .catch((error) => {
         console.error("Error adding comment: ", error);
@@ -56,6 +63,16 @@ class PostFooter extends Component {
 
     this.setState({ commentText: "" });
     this.toggleCommentModal();
+  };
+
+  countComments = () => {
+    const { imagePath } = this.props;
+    const parts = imagePath.split("/");
+    const commentsRef = collection(database, `gamers/${parts[1]}/posts/${this.props.postId}/comments`);
+    getDocs(commentsRef)
+    .then((commentsSnapshot) => {
+      this.setState({ commentsCount: commentsSnapshot.size });
+    })
   };
 
   renderCommentModal() {
@@ -104,7 +121,7 @@ class PostFooter extends Component {
             <Text style={styles.likesCount}>{this.state.likes}</Text>
           </View>
           <View style={styles.postComments}>
-            <Text style={styles.commentsCount}>{this.props.comments}</Text>
+            <Text style={styles.commentsCount}>{this.state.commentsCount}</Text>
             <Text style={styles.comments}>comments</Text>
           </View>
         </View>

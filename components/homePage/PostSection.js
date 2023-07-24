@@ -13,7 +13,6 @@ import { useEffect } from "react";
 const PostSection = (props) => {
   const [imageUrl, setImageUrl] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
-  const [userId, setUserId] = useState("");
 
   useEffect(() => {
     if (props.imagePath) {
