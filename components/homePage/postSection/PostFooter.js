@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Text } from "react-native";
+import { View, Text, Modal } from "react-native";
 import colors from "../../../colors";
 import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
@@ -16,13 +16,14 @@ class PostFooter extends Component {
       commentModalVisible: false,
       commentText: "",
       commentsCount: 0,
+      showComments: false,
+      commentsData: [],
     };
   }
 
   componentDidMount() {
     this.countComments();
   }
-
 
   handleLike = () => {
     this.setState((prevState) => ({
@@ -40,6 +41,18 @@ class PostFooter extends Component {
       }
     );
   };
+
+  toggleComments = () => {
+    this.setState(
+      (prevState) => ({
+        showComments: !prevState.showComments,
+      }),
+      () => {
+        console.log("Comments visible:", this.state.showComments);
+      }
+    );
+  };
+
   handleCommentTextChange = (text) => {
     this.setState({ commentText: text });
   };
@@ -47,12 +60,18 @@ class PostFooter extends Component {
   submitComment = () => {
     const { commentText } = this.state;
     const { imagePath } = this.props;
-    
-      const parts = imagePath.split("/");
 
-    addDoc(collection(database, `gamers/${parts[1]}/posts/${this.props.postId}/comments`) , {
+    const parts = imagePath.split("/");
+
+    addDoc(
+      collection(
+        database,
+        `gamers/${parts[1]}/posts/${this.props.postId}/comments`
+      ),
+      {
         textContent: commentText,
-      })
+      }
+    )
       .then((docRef) => {
         console.log("Comment added with ID: ", docRef.id);
         this.countComments();
@@ -68,11 +87,13 @@ class PostFooter extends Component {
   countComments = () => {
     const { imagePath } = this.props;
     const parts = imagePath.split("/");
-    const commentsRef = collection(database, `gamers/${parts[1]}/posts/${this.props.postId}/comments`);
-    getDocs(commentsRef)
-    .then((commentsSnapshot) => {
+    const commentsRef = collection(
+      database,
+      `gamers/${parts[1]}/posts/${this.props.postId}/comments`
+    );
+    getDocs(commentsRef).then((commentsSnapshot) => {
       this.setState({ commentsCount: commentsSnapshot.size });
-    })
+    });
   };
 
   renderCommentModal() {
@@ -112,6 +133,54 @@ class PostFooter extends Component {
     );
   }
 
+  renderCommentsList() {
+
+    if (!this.state.showComments) {
+      return null;
+    }
+
+    const { imagePath } = this.props;
+    const { commentsData } = this.state;
+    const parts = imagePath.split("/");
+    const commentsRef = collection(
+      database,
+      `gamers/${parts[1]}/posts/${this.props.postId}/comments`
+    );
+    getDocs(commentsRef).then((commentsSnapshot) => {
+      this.setState({
+        commentsData: commentsSnapshot.docs.map((doc) => doc.data()),
+      });
+    });
+
+    return (
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={this.state.showComments}
+        onRequestClose={this.toggleComments}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.commentsListContainer}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={this.toggleComments}
+            >
+              <Text style={styles.closeButtonText}>Close</Text>
+            </TouchableOpacity>
+            {commentsData.map((comment, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[styles.commentItem]}
+              >
+                <Text style={styles.commentText}>{comment.textContent}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
   render() {
     return (
       <View style={styles.postFooter}>
@@ -121,8 +190,12 @@ class PostFooter extends Component {
             <Text style={styles.likesCount}>{this.state.likes}</Text>
           </View>
           <View style={styles.postComments}>
-            <Text style={styles.commentsCount}>{this.state.commentsCount}</Text>
-            <Text style={styles.comments}>comments</Text>
+            <TouchableOpacity onPress={this.toggleComments}>
+              <Text style={styles.commentsCount}>
+                {this.state.commentsCount}
+              </Text>
+              <Text style={styles.comments}>comments</Text>
+            </TouchableOpacity>
           </View>
         </View>
         <View style={styles.postFooterBottom}>
@@ -145,7 +218,7 @@ class PostFooter extends Component {
             <Text style={styles.postFooterButtonText}>Send</Text>
           </TouchableOpacity>
         </View>
-
+        {this.renderCommentsList()}
         {this.renderCommentModal()}
       </View>
     );
@@ -278,6 +351,38 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  commentsListContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 5,
+    maxHeight: "70%",
+    width: "80%",
+    overflow: "hidden",
+  },
+  commentItem: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: colors.lightGray,
+  },
+  commentText: {
+    fontSize: 16,
+    color: colors.darkGrey,
+  },
+  closeButton: {
+    alignSelf: "flex-end",
+    paddingVertical: 5,
+  },
+  closeButtonText: {
+    fontSize: 16,
+    color: "blue",
+    fontWeight: "bold",
   },
 });
 
