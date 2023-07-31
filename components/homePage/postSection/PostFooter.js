@@ -161,12 +161,6 @@ class PostFooter extends Component {
       >
         <View style={styles.modalContainer}>
           <View style={styles.commentsListContainer}>
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={this.toggleComments}
-            >
-              <Text style={styles.closeButtonText}>Close</Text>
-            </TouchableOpacity>
             {commentsData.map((comment, index) => (
               <TouchableOpacity
                 key={index}
@@ -374,15 +368,6 @@ const styles = StyleSheet.create({
   commentText: {
     fontSize: 16,
     color: colors.darkGrey,
-  },
-  closeButton: {
-    alignSelf: "flex-end",
-    paddingVertical: 5,
-  },
-  closeButtonText: {
-    fontSize: 16,
-    color: "blue",
-    fontWeight: "bold",
   },
 });
 
