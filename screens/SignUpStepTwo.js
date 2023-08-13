@@ -115,6 +115,7 @@ const createGamer = (route) => {
           firstName: route.params.firstName,
           lastName: route.params.lastName,
           dateOfBirth: route.params.dateOfBirth,
+          email: auth.currentUser.email,
         })
         .then(() => {
           resolve();
