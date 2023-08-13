@@ -5,12 +5,13 @@ import { StyleSheet } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import EntypoIcon from "../EntypoIcon";
 import { Image } from "react-native";
+import { auth } from "../../config/firebase";
 
 const NewPostSection = (props) => {
   
     return (
       <View style={styles.newPostSection}>
-        <TouchableOpacity style={styles.profilePicture} onPress={() => props.nav.navigate("UserProfile")}>
+        <TouchableOpacity style={styles.profilePicture} onPress={() => props.nav.navigate("UserProfile", auth.currentUser.uid)}>
         {props.avatarUrl && (
           <Image style={styles.profileImage} source={{ uri: props.avatarUrl }} />
         )}

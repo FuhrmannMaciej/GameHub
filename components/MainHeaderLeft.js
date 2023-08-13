@@ -16,7 +16,9 @@ class MainHeaderLeft extends Component {
             style={styles.camera}
           />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity
+        onPress={() => this.props.nav.navigate("Search")}
+        >
           <EntypoIcon
             name="magnifying-glass"
             size={24}

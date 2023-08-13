@@ -43,7 +43,7 @@ const Home = ({ navigation }) => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerLeft: () => <MainHeaderLeft />,
+      headerLeft: () => <MainHeaderLeft nav={navigation}/>,
       headerRight: () => <MainHeaderRight nav={navigation} />,
     });
 

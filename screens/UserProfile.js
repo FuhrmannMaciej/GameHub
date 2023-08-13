@@ -14,7 +14,8 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../config/firebase";
 import { ImageBackground } from "react-native";
 
-const UserProfile = ({ navigation }) => {
+const UserProfile = ({ navigation, route }) => {
+  const userId = route.params.userId;
   const [userInfo, setUserInfo] = useState(null);
   const [avatar, setAvatar] = useState("");
 
@@ -26,18 +27,24 @@ const UserProfile = ({ navigation }) => {
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const userId = auth.currentUser.uid;
-      const userRef = doc(database, "gamers", userId);
-      const userDoc = await getDoc(userRef);
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        const dateOfBirth = new Date(userData.dateOfBirth.seconds * 1000);
-        setUserInfo({ ...userData, dateOfBirth });
+      try {
+        const userRef = doc(database, "gamers", userId);
+        const userDoc = await getDoc(userRef);
+        
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const dateOfBirth = new Date(userData.dateOfBirth.seconds * 1000);
+          const email = userData.email;
+          
+          setUserInfo({ ...userData, dateOfBirth, email });
+        }
+      } catch (error) {
+        console.error("Error fetching user info:", error);
       }
     };
 
     const fetchAvatar = async () => {
-      const avatarPath = `avatars/${auth.currentUser.uid}`;
+      const avatarPath = `avatars/${userId}`;
       const storageRef = ref(storage, avatarPath);
       const url = await getDownloadURL(storageRef);
       setAvatar(url);
@@ -75,7 +82,7 @@ const UserProfile = ({ navigation }) => {
         xhr.onload = async function () {
           const blob = xhr.response;
 
-          avatarPath = `avatars/${auth.currentUser.uid}`;
+          avatarPath = `avatars/${userId}`;
           const storageRef = ref(storage, avatarPath);
           const uploadTask = uploadBytes(storageRef, blob);
 
@@ -110,7 +117,7 @@ const UserProfile = ({ navigation }) => {
       <StatusBar backgroundColor={colors.primaryDark} />
       <View style={styles.profileContainer}>
         <TouchableOpacity style={styles.profilePicture} onPress={pickAvatar}>
-        {avatar !== "" && (
+          {avatar !== "" && (
             <ImageBackground
               source={{ uri: avatar }}
               style={styles.avatarImage}
@@ -130,7 +137,7 @@ const UserProfile = ({ navigation }) => {
         </View>
         <View style={styles.userInfo}>
           <Text style={styles.userInfoText}>
-            Email: {auth.currentUser.email}
+            Email: {userInfo?.email}
           </Text>
           <Text style={styles.userInfoText}>
             Date of Birth:{" "}
