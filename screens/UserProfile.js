@@ -15,7 +15,7 @@ import { storage } from "../config/firebase";
 import { ImageBackground } from "react-native";
 
 const UserProfile = ({ navigation, route }) => {
-  const userId = route.params.userId;
+  const userId = route.params.userId || auth.currentUser.uid;
   const [userInfo, setUserInfo] = useState(null);
   const [avatar, setAvatar] = useState("");
 
@@ -30,18 +30,24 @@ const UserProfile = ({ navigation, route }) => {
       try {
         const userRef = doc(database, "gamers", userId);
         const userDoc = await getDoc(userRef);
-        
+    
         if (userDoc.exists()) {
           const userData = userDoc.data();
-          const dateOfBirth = new Date(userData.dateOfBirth.seconds * 1000);
-          const email = userData.email;
-          
-          setUserInfo({ ...userData, dateOfBirth, email });
+          if (userData && userData.dateOfBirth && userData.email) {
+            const dateOfBirth = new Date(userData.dateOfBirth.seconds * 1000);
+            const email = userData.email;
+            setUserInfo({ ...userData, dateOfBirth, email });
+          } else {
+            console.error("userData or its properties are undefined or missing.");
+          }
+        } else {
+          console.error("User document does not exist.");
         }
       } catch (error) {
         console.error("Error fetching user info:", error);
       }
     };
+    
 
     const fetchAvatar = async () => {
       const avatarPath = `avatars/${userId}`;

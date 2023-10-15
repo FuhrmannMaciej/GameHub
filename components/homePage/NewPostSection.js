@@ -11,7 +11,7 @@ const NewPostSection = (props) => {
   
     return (
       <View style={styles.newPostSection}>
-        <TouchableOpacity style={styles.profilePicture} onPress={() => props.nav.navigate("UserProfile", auth.currentUser.uid)}>
+        <TouchableOpacity style={styles.profilePicture} onPress={() => props.nav.navigate("UserProfile", { userId: auth.currentUser.uid })}>
         {props.avatarUrl && (
           <Image style={styles.profileImage} source={{ uri: props.avatarUrl }} />
         )}

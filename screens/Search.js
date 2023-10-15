@@ -21,7 +21,10 @@ const Search = ({ navigation }) => {
       const usersRef = collection(database, "gamers");
       const q = query(usersRef, where("firstName", "==", searchQuery));
       const querySnapshot = await getDocs(q);
-      const users = querySnapshot.docs.map((doc) => doc.data());
+      const users = querySnapshot.docs.map((doc) => ({
+        userId: doc.id,
+        ...doc.data(),
+      }));
       setSearchResults(users);
     } catch (error) {
       console.error("Error searching for users: ", error);
@@ -29,6 +32,7 @@ const Search = ({ navigation }) => {
   };
 
   const renderItem = ({ item }) => {
+    console.log("Item userId: ", item.userId);
     return (
       <View style={{ height: 70, backgroundColor: colors.lightGray }}>
       <TouchableOpacity

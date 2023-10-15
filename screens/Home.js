@@ -6,7 +6,7 @@ import MainHeaderLeft from "../components/MainHeaderLeft";
 import MainHeaderRight from "../components/MainHeaderRight";
 import NewPostSection from "../components/homePage/NewPostSection";
 import PostSection from "../components/homePage/PostSection";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { collection, query, orderBy } from "firebase/firestore";
 import { database } from "../config/firebase";
@@ -36,10 +36,12 @@ const Home = ({ navigation }) => {
   }, [navigation]);
 
   const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await generatePostsList(setPosts);
-    setRefreshing(false);
-  }, []);
+  console.log("Refresh started");
+  setRefreshing(true);
+  await generatePostsList(setPosts);
+  setRefreshing(false);
+  console.log("Refresh completed");
+}, []);
 
   useEffect(() => {
     navigation.setOptions({
@@ -68,7 +70,7 @@ const Home = ({ navigation }) => {
     <View style={styles.container}>
       <StatusBar backgroundColor={colors.primaryDark} />
       <SecondHeader nav={navigation} />
-      <NewPostSection nav={navigation} avatarUrl={avatarUrl} />
+      <NewPostSection nav={navigation} avatarUrl={avatarUrl}/>
       <SafeAreaView style={styles.postSectionList}>
         <FlatList
           data={posts}

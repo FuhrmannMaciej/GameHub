@@ -43,7 +43,7 @@ const PostSection = (props) => {
           console.log("Error occurred while checking storage image reference:", error);
         });
       }
-  }, [avatarUrl]);
+  });
 
   return (
     <View style={styles.container}>
