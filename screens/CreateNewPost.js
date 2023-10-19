@@ -131,10 +131,14 @@ const CreateNewPost = ({navigation}) => {
     };
 
     const fetchAvatar = async () => {
-      const avatarPath = `avatars/${auth.currentUser.uid}`;
-      const storageRef = ref(storage, avatarPath);
-      const url = await getDownloadURL(storageRef);
-      setAvatarUrl(url);
+      try {
+        const avatarPath = `avatars/${auth.currentUser.uid}`;
+        const storageRef = ref(storage, avatarPath);
+        const url = await getDownloadURL(storageRef);
+        setAvatarUrl(url);
+      } catch (error) {
+        setAvatarUrl("");
+      }
     };
 
     fetchUserInfo();

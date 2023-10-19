@@ -13,6 +13,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../config/firebase";
 import { ImageBackground } from "react-native";
+import { tr } from "date-fns/locale";
 
 const UserProfile = ({ navigation, route }) => {
   const userId = route.params.userId || auth.currentUser.uid;
@@ -50,10 +51,14 @@ const UserProfile = ({ navigation, route }) => {
     
 
     const fetchAvatar = async () => {
+      try {
       const avatarPath = `avatars/${userId}`;
       const storageRef = ref(storage, avatarPath);
       const url = await getDownloadURL(storageRef);
       setAvatar(url);
+      } catch (error) {
+        setAvatar("");
+      }
     };
 
     fetchUserInfo();

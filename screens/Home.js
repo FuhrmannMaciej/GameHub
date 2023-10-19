@@ -21,10 +21,14 @@ const Home = ({ navigation }) => {
   const [avatarUrl, setAvatarUrl] = useState("");
 
   const fetchAvatar = async () => {
-    const avatarPath = `avatars/${auth.currentUser.uid}`;
-    const storageRef = ref(storage, avatarPath);
-    const url = await getDownloadURL(storageRef);
-    setAvatarUrl(url);
+    try {
+      const avatarPath = `avatars/${auth.currentUser.uid}`;
+      const storageRef = ref(storage, avatarPath);
+      const url = await getDownloadURL(storageRef);
+      setAvatarUrl(url);
+    } catch (error) {
+      setAvatarUrl("");
+    }
   };
 
   useEffect(() => {
@@ -57,7 +61,7 @@ const Home = ({ navigation }) => {
               <PostSection
                 id={item._id}
                 username={item.firstName + " " + item.lastName}
-                whenPosted={item.createdAt.toLocaleString()}
+                whenPosted={item.createdAt.toLocaleString('en-GB')}
                 textContent={item.textContent}
                 imagePath={item.imagePath}
                 likes={item.likes}

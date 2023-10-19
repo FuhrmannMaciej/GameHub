@@ -21,7 +21,11 @@ export default function SignUpStepOne({ navigation }) {
   const [showPlaceholder, setShowPlaceholder] = useState(true);
 
   const onHandleSignup = () => {
-    navigation.navigate("SignUpStepTwo", { firstName, lastName, dateOfBirth });
+    const dateOfBirthTimeStamp = dateOfBirth.getTime();
+    navigation.navigate("SignUpStepTwo", { 
+      firstName, 
+      lastName, 
+      dateOfBirth: dateOfBirthTimeStamp });
   };
 
   LogBox.ignoreLogs([
