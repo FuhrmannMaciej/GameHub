@@ -208,8 +208,8 @@ class PostFooter extends Component {
             <Text style={styles.postFooterButtonText}>Comment</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.postFooterButton}>
-            <EntypoIcon name="paper-plane" />
-            <Text style={styles.postFooterButtonText}>Send</Text>
+            {/* <EntypoIcon name="paper-plane" />
+            <Text style={styles.postFooterButtonText}>Send</Text> */}
           </TouchableOpacity>
         </View>
         {this.renderCommentsList()}

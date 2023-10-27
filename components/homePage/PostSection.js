@@ -58,7 +58,7 @@ const PostSection = (props) => {
           <Text style={styles.whenPosted}>{props.whenPosted}</Text>
         </View>
         <TouchableOpacity style={styles.closeButton}>
-          <EntypoIcon name="cross" />
+          {/* <EntypoIcon name="cross" /> */}
         </TouchableOpacity>
       </View>
       <View style={styles.postContent}>

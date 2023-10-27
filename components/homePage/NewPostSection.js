@@ -21,7 +21,7 @@ const NewPostSection = (props) => {
           <Text style={styles.newPostButtonPlaceholder}>Ready to Tell Your Gamer Tale?</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.galleryIcon}>
-          <EntypoIcon name="images" />
+          {/* <EntypoIcon name="images" /> */}
         </TouchableOpacity>
       </View>
     );

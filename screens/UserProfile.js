@@ -138,14 +138,14 @@ const UserProfile = ({ navigation, route }) => {
         <Text style={styles.userName}>
           {userInfo?.firstName} {userInfo?.lastName}
         </Text>
-        <View style={styles.chatAndSettings}>
+        {/* <View style={styles.chatAndSettings}>
           <TouchableOpacity style={styles.chatButton}>
             <EntypoIcon name="chat" color={colors.darkGrey} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.settingsButton}>
             <EntypoIcon name="dots-three-horizontal" color={colors.darkGrey} />
           </TouchableOpacity>
-        </View>
+        </View> */}
         <View style={styles.userInfo}>
           <Text style={styles.userInfoText}>
             Email: {userInfo?.email}

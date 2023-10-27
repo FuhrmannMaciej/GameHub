@@ -14,14 +14,14 @@ class UserProfileHeader extends Component {
                 onPress={() => this.props.nav.navigate("Home")}>
           <EntypoIcon name="arrow-long-left" color={colors.lightGray} />
         </TouchableOpacity>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <EntypoIcon
             name="magnifying-glass"
             size={24}
             color={colors.lightGray}
             style={styles.search}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     );
   }

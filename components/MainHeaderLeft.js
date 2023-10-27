@@ -9,13 +9,13 @@ class MainHeaderLeft extends Component {
   render() {
     return (
       <View style={{ flexDirection: "row" }}>
-        <TouchableOpacity>
+        {/* <TouchableOpacity>
           <EntypoIcon
             name="camera"
             color={colors.lightGray}
             style={styles.camera}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
         <TouchableOpacity
         onPress={() => this.props.nav.navigate("Search")}
         >
@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: colors.lightGray,
     paddingBottom: 5,
-    width: 280,
+    width: 320,
   },
 });
 

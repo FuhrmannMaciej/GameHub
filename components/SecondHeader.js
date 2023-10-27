@@ -14,7 +14,7 @@ class SecondHeader extends Component {
         this.props.nav.navigate("Home")}>
           <EntypoIcon />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.icon}>
+        {/* <TouchableOpacity style={styles.icon}>
           <EntypoIcon name="bell" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon}>
@@ -22,7 +22,7 @@ class SecondHeader extends Component {
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon}>
           <EntypoIcon name="dots-three-vertical" />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     );
   }
