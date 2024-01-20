@@ -3,7 +3,6 @@ import { View, StatusBar, StyleSheet, Text } from "react-native";
 import colors from "../colors";
 import UserProfileHeader from "../components/UserProfileHeader";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import EntypoIcon from "../components/EntypoIcon";
 import { auth } from "../config/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { database } from "../config/firebase";
@@ -13,7 +12,7 @@ import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../config/firebase";
 import { ImageBackground } from "react-native";
-import { tr } from "date-fns/locale";
+import { collection, query, getDocs, where } from "firebase/firestore";
 
 const UserProfile = ({ navigation, route }) => {
   const userId = route.params.userId || auth.currentUser.uid;
@@ -31,15 +30,48 @@ const UserProfile = ({ navigation, route }) => {
       try {
         const userRef = doc(database, "gamers", userId);
         const userDoc = await getDoc(userRef);
-    
+
         if (userDoc.exists()) {
           const userData = userDoc.data();
           if (userData && userData.dateOfBirth && userData.email) {
             const dateOfBirth = new Date(userData.dateOfBirth.seconds * 1000);
             const email = userData.email;
-            setUserInfo({ ...userData, dateOfBirth, email });
+
+            // Mapping category IDs to category names
+            const favoriteCategories = userData.favoriteCategories || [];
+            const categoryNames = await Promise.all(
+              favoriteCategories.map(async (categoryId) => {
+                try {
+                  const categoryRef = collection(database, `gameCategories`);
+                  const categoryQuerySnapshot = await getDocs(
+                    query(categoryRef, where("categoryId", "==", categoryId))
+                  );
+            
+                  if (!categoryQuerySnapshot.empty) {
+                    const categoryDoc = categoryQuerySnapshot.docs[0];
+                    return categoryDoc.data().categoryName || "Unknown Category";
+                  } else {
+                    return "Unknown Category";
+                  }
+                } catch (error) {
+                  console.error("Error fetching category info:", error);
+                  return "Unknown Category";
+                }
+              })
+            );
+            
+            
+
+            setUserInfo({
+              ...userData,
+              dateOfBirth,
+              email,
+              favoriteCategories: categoryNames.filter(Boolean),
+            });
           } else {
-            console.error("userData or its properties are undefined or missing.");
+            console.error(
+              "userData or its properties are undefined or missing."
+            );
           }
         } else {
           console.error("User document does not exist.");
@@ -48,14 +80,13 @@ const UserProfile = ({ navigation, route }) => {
         console.error("Error fetching user info:", error);
       }
     };
-    
 
     const fetchAvatar = async () => {
       try {
-      const avatarPath = `avatars/${userId}`;
-      const storageRef = ref(storage, avatarPath);
-      const url = await getDownloadURL(storageRef);
-      setAvatar(url);
+        const avatarPath = `avatars/${userId}`;
+        const storageRef = ref(storage, avatarPath);
+        const url = await getDownloadURL(storageRef);
+        setAvatar(url);
       } catch (error) {
         setAvatar("");
       }
@@ -147,13 +178,17 @@ const UserProfile = ({ navigation, route }) => {
           </TouchableOpacity>
         </View> */}
         <View style={styles.userInfo}>
-          <Text style={styles.userInfoText}>
-            Email: {userInfo?.email}
-          </Text>
+          <Text style={styles.userInfoText}>Email: {userInfo?.email}</Text>
           <Text style={styles.userInfoText}>
             Date of Birth:{" "}
             {userInfo?.dateOfBirth &&
               format(userInfo.dateOfBirth, "MM/dd/yyyy")}
+          </Text>
+          <Text style={styles.userInfoText}>
+            Favorite Game Categories:{" "}
+            {userInfo?.favoriteCategories?.length > 0
+              ? userInfo.favoriteCategories.join(", ")
+              : "No favorite categories"}
           </Text>
         </View>
       </View>
@@ -198,13 +233,14 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 10,
-    marginTop: 10,
+    marginBottom: 80,
+    marginTop: 20,
   },
   userInfoText: {
     fontSize: 16,
     color: colors.darkGray,
     marginBottom: 10,
+    marginTop: 20,
   },
   closeButton: {
     height: 40,
