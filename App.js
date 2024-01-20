@@ -14,6 +14,7 @@ import CreateNewPost from './screens/CreateNewPost';
 import colors from "./colors";
 import UserProfile from "./screens/UserProfile";
 import Search from "./screens/Search";
+import GameCategories from "./screens/GameCategories";
 
 const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
@@ -41,6 +42,7 @@ function HomeStack() {
       <Stack.Screen name="CreateNewPost" component={CreateNewPost} />
       <Stack.Screen name="UserProfile" component={UserProfile} />
       <Stack.Screen name="Search" component={Search} />
+      <Stack.Screen name="GameCategories" component={GameCategories} />
     </Stack.Navigator>
   )
 }

@@ -12,15 +12,17 @@ class SecondHeader extends Component {
         <TouchableOpacity style={styles.icon}
         onPress={() => 
         this.props.nav.navigate("Home")}>
-          <EntypoIcon />
+          <EntypoIcon/>
         </TouchableOpacity>
-        {/* <TouchableOpacity style={styles.icon}>
-          <EntypoIcon name="bell" />
+        <TouchableOpacity style={styles.icon}
+        onPress={() => 
+        this.props.nav.navigate("GameCategories")}>
+          <EntypoIcon name="game-controller" />
         </TouchableOpacity>
         <TouchableOpacity style={styles.icon}>
           <EntypoIcon name="users" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.icon}>
+        {/* <TouchableOpacity style={styles.icon}>
           <EntypoIcon name="dots-three-vertical" />
         </TouchableOpacity> */}
       </View>
