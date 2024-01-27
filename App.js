@@ -15,6 +15,7 @@ import colors from "./colors";
 import UserProfile from "./screens/UserProfile";
 import Search from "./screens/Search";
 import GameCategories from "./screens/GameCategories";
+import Groups from "./screens/Groups";
 
 const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
@@ -43,6 +44,7 @@ function HomeStack() {
       <Stack.Screen name="UserProfile" component={UserProfile} />
       <Stack.Screen name="Search" component={Search} />
       <Stack.Screen name="GameCategories" component={GameCategories} />
+      <Stack.Screen name="Groups" component={Groups} />
     </Stack.Navigator>
   )
 }

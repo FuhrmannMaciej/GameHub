@@ -19,7 +19,9 @@ class SecondHeader extends Component {
         this.props.nav.navigate("GameCategories")}>
           <EntypoIcon name="game-controller" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.icon}>
+        <TouchableOpacity style={styles.icon}
+        onPress={() =>
+        this.props.nav.navigate("Groups")}>
           <EntypoIcon name="users" />
         </TouchableOpacity>
         {/* <TouchableOpacity style={styles.icon}>
