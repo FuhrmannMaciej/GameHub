@@ -1,7 +1,6 @@
-// CreateNewGroup.js
 import React, { useState, useEffect } from "react";
 import { View, Text, TextInput, StyleSheet, Button} from "react-native";
-import colors from "../colors"; // Make sure to import your color styles
+import colors from "../colors";
 import { collection, getDocs, query, where, orderBy, limit, addDoc } from "firebase/firestore";
 import { auth, database } from "../config/firebase";
 import { Picker } from "@react-native-picker/picker";
@@ -13,7 +12,6 @@ const CreateNewGroup = ({navigation}) => {
   const [gameCategories, setGameCategories] = useState([]);
 
   useEffect(() => {
-    // Fetch game categories when the component mounts
     const fetchGameCategories = async () => {
       try {
         const categoriesRef = collection(database, "gameCategories");
@@ -30,17 +28,15 @@ const CreateNewGroup = ({navigation}) => {
 
   const handleCreateGroup = async () => {
     try {
-      // Get the last created group to determine the next groupId
       const lastGroupQuery = query(collection(database, "groups"), orderBy("groupId", "desc"), limit(1));
       const lastGroupSnapshot = await getDocs(lastGroupQuery);
   
-      let newGroupId = 1; // Default if no groups exist yet
+      let newGroupId = 1;
       if (!lastGroupSnapshot.empty) {
         const lastGroupData = lastGroupSnapshot.docs[0].data();
         newGroupId = lastGroupData.groupId + 1;
       }
   
-      // Create the new group
       const newGroupData = {
         groupId: newGroupId,
         groupName: groupName,
@@ -52,11 +48,9 @@ const CreateNewGroup = ({navigation}) => {
         ...newGroupData,
       });
   
-      // Navigate back to the previous screen or handle navigation as needed
       navigation.goBack();
     } catch (error) {
       console.error("Error creating group: ", error);
-      // Handle error, show alert, etc.
     }
   };
 

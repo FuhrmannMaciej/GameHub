@@ -7,11 +7,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebase";
 import GroupsHeaderLeft from "../components/groupsPage/GroupsHeaderLeft";
 import GroupsHeaderRight from "../components/groupsPage/GroupsHeaderRight";
+import { useIsFocused } from "@react-navigation/native";
 
 const Groups = ({ navigation }) => {
   const [groups, setGroups] = useState([]);
+  const isFocused = useIsFocused();
 
-  useEffect(() => {
     const fetchGroups = async () => {
       try {
         const groupsRef = collection(database, "groups");
@@ -54,8 +55,9 @@ const Groups = ({ navigation }) => {
       }
     };
 
+  useEffect(() => {
     fetchGroups();
-  }, []);
+  }, [isFocused]);
 
   useEffect(() => {
     navigation.setOptions({
@@ -68,15 +70,34 @@ const Groups = ({ navigation }) => {
 
   const handleGroupJoin = async (groupId) => {
     try {
-      const userDocRef = doc(database, "gamers", auth.currentUser.uid);
-      await updateDoc(userDocRef, {
-        joinedGroups: arrayUnion(groupId),
-      });
-      Alert.alert("Group Joined", "You've successfully joined the group!");
+      const groupRef = collection(database, `groups`);
+      const groupQuerySnapshot = await getDocs(
+        query(groupRef, where("groupId", "==", groupId))
+      );
+  
+      if (!groupQuerySnapshot.empty) {
+        const groupDoc = groupQuerySnapshot.docs[0];
+  
+        const groupData = groupDoc.data();
+  
+        if (groupData.joinedPlayers.includes(auth.currentUser.uid)) {
+          Alert.alert("Already Joined", "You have already joined this group.");
+        } else {
+          await updateDoc(groupDoc.ref, {
+            joinedPlayers: arrayUnion(auth.currentUser.uid),
+          });
+  
+          Alert.alert("Group Joined", "You've successfully joined the group!");
+        }
+      } else {
+        Alert.alert("Group Not Found", "The group you are trying to join does not exist.");
+      }
     } catch (error) {
       console.error("Error updating user's joined groups: ", error);
     }
   };
+  
+  
 
   const renderItem = ({ item }) => (
     <View style={styles.groupItem}>
