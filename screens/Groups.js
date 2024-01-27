@@ -5,6 +5,8 @@ import { collection, query, getDocs, doc, updateDoc, where, arrayUnion, arrayRem
 import { database } from "../config/firebase";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { auth } from "../config/firebase";
+import GroupsHeaderLeft from "../components/groupsPage/GroupsHeaderLeft";
+import GroupsHeaderRight from "../components/groupsPage/GroupsHeaderRight";
 
 const Groups = ({ navigation }) => {
   const [groups, setGroups] = useState([]);
@@ -15,15 +17,17 @@ const Groups = ({ navigation }) => {
         const groupsRef = collection(database, "groups");
         const querySnapshot = await getDocs(groupsRef);
 
-        const groupsData = await Promise.all(querySnapshot.docs.map(async (doc) => {
-          const data = doc.data();
-          const gameCategoryName = await getCategoryName(data.gameCategory);
-          return {
-            groupId: doc.id,
-            ...data,
-            gameCategoryName,
-          };
-        }));
+        const groupsData = await Promise.all(
+          querySnapshot.docs.map(async (doc) => {
+            const data = doc.data();
+            const gameCategoryName = await getCategoryName(data.gameCategory);
+            return {
+              groupId: doc.id,
+              ...data,
+              gameCategoryName,
+            };
+          })
+        );
 
         setGroups(groupsData);
       } catch (error) {
@@ -33,9 +37,17 @@ const Groups = ({ navigation }) => {
 
     const getCategoryName = async (categoryId) => {
       try {
-        const categoryRef = doc(database, "gameCategories", categoryId);
-        const categoryDoc = await getDoc(categoryRef);
-        return categoryDoc.data().categoryName || "Unknown Category";
+        const categoryRef = collection(database, `gameCategories`);
+        const categoryQuerySnapshot = await getDocs(
+          query(categoryRef, where("categoryId", "==", categoryId))
+        );
+  
+        if (!categoryQuerySnapshot.empty) {
+          const categoryDoc = categoryQuerySnapshot.docs[0];
+          return categoryDoc.data().categoryName || "Unknown Category";
+        } else {
+          return "Unknown Category";
+        }
       } catch (error) {
         console.error("Error fetching category info:", error);
         return "Unknown Category";
@@ -44,6 +56,15 @@ const Groups = ({ navigation }) => {
 
     fetchGroups();
   }, []);
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => <GroupsHeaderLeft nav={navigation} />,
+      headerRight: () => (
+        <GroupsHeaderRight nav={navigation} />
+      ),
+    });
+  }, [navigation]);
 
   const handleGroupJoin = async (groupId) => {
     try {
