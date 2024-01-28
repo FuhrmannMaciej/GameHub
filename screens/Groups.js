@@ -93,7 +93,7 @@ const Groups = ({ navigation }) => {
     });
   }, [navigation]);
 
-  const handleGroupJoin = async (groupId) => {
+  const handleGroupJoin = async (groupId, maxPlayers) => {
     try {
       const groupRef = collection(database, `groups`);
       const groupQuerySnapshot = await getDocs(
@@ -108,11 +108,15 @@ const Groups = ({ navigation }) => {
         if (groupData.joinedPlayers.includes(auth.currentUser.uid)) {
           Alert.alert("Already Joined", "You have already joined this group.");
         } else {
-          await updateDoc(groupDoc.ref, {
-            joinedPlayers: arrayUnion(auth.currentUser.uid),
-          });
+          if (groupData.joinedPlayers.length < maxPlayers) {
+            await updateDoc(groupDoc.ref, {
+              joinedPlayers: arrayUnion(auth.currentUser.uid),
+            });
 
-          Alert.alert("Group Joined", "You've successfully joined the group!");
+            Alert.alert("Group Joined", "You've successfully joined the group!");
+          } else {
+            Alert.alert("Group Full", "This group is already full.");
+          }
         }
       } else {
         Alert.alert(
@@ -129,15 +133,20 @@ const Groups = ({ navigation }) => {
     <View style={styles.groupItem}>
       <View>
         <Text style={styles.groupName}>Name: {item.groupName}</Text>
-        <Text style={styles.groupCategory}>Category: {item.gameCategoryName}</Text>
+        <Text style={styles.groupCategory}>
+          Category: {item.gameCategoryName}
+        </Text>
         <Text style={styles.joinedPlayers}>
           Joined Players:{"\n"}
-          {item.joinedPlayers.map(player => `${player}\n`) || "None"}
+          {item.joinedPlayers.map((player) => `${player}\n`) || "None"}
+        </Text>
+        <Text style={styles.playerCounter}>
+          {item.joinedPlayers.length}/5 joined
         </Text>
       </View>
       <TouchableOpacity
         style={styles.joinButton}
-        onPress={() => handleGroupJoin(item.groupId)}
+        onPress={() => handleGroupJoin(item.groupId, 5)}
       >
         <Text style={styles.joinButtonText}>Join</Text>
       </TouchableOpacity>
@@ -205,6 +214,10 @@ const styles = StyleSheet.create({
   },
   joinedPlayers: {
     fontSize: 14,
+    color: colors.white,
+  },
+  playerCounter: {
+    fontSize: 12,
     color: colors.white,
   },
 });
