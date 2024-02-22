@@ -3,104 +3,115 @@ import React, {
   useEffect,
   useLayoutEffect,
   useCallback,
-} from 'react';
-import { TouchableOpacity, View, TextInput, FlatList, Text } from 'react-native';
-import { GiftedChat, Avatar } from 'react-native-gifted-chat'; // Make sure to import Avatar
+} from "react";
+import {
+  TouchableOpacity,
+  View,
+  TextInput,
+  FlatList,
+  Text,
+  StyleSheet,
+} from "react-native";
+import { GiftedChat, Avatar } from "react-native-gifted-chat";
 import {
   collection,
   addDoc,
   orderBy,
   query,
   onSnapshot,
-  where,
-} from 'firebase/firestore';
-import { signOut } from 'firebase/auth';
-import { auth, database, storage } from '../config/firebase'; // Import storage
-import { AntDesign } from '@expo/vector-icons';
-import colors from '../colors';
+  getDocs,
+} from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { auth, database } from "../config/firebase";
+import { AntDesign } from "@expo/vector-icons";
+import colors from "../colors";
 
 export default function StartChat({ navigation }) {
   const [messages, setMessages] = useState([]);
-  const [searchText, setSearchText] = useState('');
+  const [searchText, setSearchText] = useState("");
   const [recentChats, setRecentChats] = useState([]);
 
   const onSignOut = () => {
-    signOut(auth).catch((error) => console.log('Error logging out: ', error));
+    signOut(auth).catch((error) => console.log("Error logging out: ", error));
   };
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <TouchableOpacity
-          style={{ marginRight: 10 }}
-          onPress={onSignOut}
-        >
-          <AntDesign name="logout" size={24} color={colors.gray} style={{ marginRight: 10 }} />
+        <TouchableOpacity style={{ marginRight: 10 }} onPress={onSignOut}>
+          <AntDesign
+            name="logout"
+            size={24}
+            color={colors.gray}
+            style={{ marginRight: 10 }}
+          />
         </TouchableOpacity>
       ),
     });
   }, [navigation]);
 
-  useLayoutEffect(() => {
-    const collectionRef = collection(database, 'chats');
-    const q = query(collectionRef, orderBy('createdAt', 'desc'));
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const collectionRef = collection(database, "chats");
+        const q = query(collectionRef, orderBy("createdAt", "desc"));
+        const querySnapshot = await getDocs(q);
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      setRecentChats(
-        querySnapshot.docs.map((doc) => ({
-          chatId: doc.id,
-          participants: doc.data().participants,
-          lastMessage: doc.data().lastMessage,
-        }))
-      );
-    });
+        setRecentChats(
+          querySnapshot.docs.map((doc) => ({
+            chatId: doc.id,
+            participants: doc.data().participants,
+            lastMessage: doc.data().lastMessage,
+          }))
+        );
+      } catch (error) {
+        console.error("Error fetching chats: ", error);
+      }
+    };
 
-    return () => unsubscribe();
+    const unsubscribe = onSnapshot(collection(database, "chats"), fetchChats);
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
-  const onSend = useCallback(
-    async (messages = []) => {
-      const { _id, createdAt, text, user } = messages[0];
-      const chatId = messages[0].chatId || createChatId(auth.currentUser.uid, user._id);
+  const onSend = useCallback(async (messages = []) => {
+    const { _id, createdAt, text, user } = messages[0];
+    const chatId =
+      messages[0].chatId || createChatId(auth.currentUser.uid, user._id);
 
-      try {
-        // Add the message to the messages collection
-        await addDoc(collection(database, 'messages'), {
-          _id,
-          createdAt,
-          text,
-          user,
-          chatId,
-        });
+    try {
+      await addDoc(collection(database, "messages"), {
+        _id,
+        createdAt,
+        text,
+        user,
+        chatId,
+      });
 
-        // Update or create the chat in the chats collection
-        await updateOrCreateChat(chatId, messages[0]);
-      } catch (error) {
-        console.error('Error sending message: ', error);
-      }
-    },
-    []
-  );
+      await updateOrCreateChat(chatId, messages[0]);
+    } catch (error) {
+      console.error("Error sending message: ", error);
+    }
+  }, []);
 
   const createChatId = (userId1, userId2) => {
-    // A function to create a unique chatId based on user ids
     const sortedIds = [userId1, userId2].sort();
     return `${sortedIds[0]}_${sortedIds[1]}`;
   };
 
   const updateOrCreateChat = async (chatId, message) => {
     try {
-      const chatRef = collection(database, 'chats').doc(chatId);
+      const chatRef = collection(database, "chats").doc(chatId);
       const chatDoc = await chatRef.get();
 
       if (chatDoc.exists) {
-        // Update the existing chat with the new message
         await chatRef.update({
           lastMessage: message,
         });
       } else {
-        // Create a new chat
-        await addDoc(collection(database, 'chats'), {
+        await addDoc(collection(database, "chats"), {
           chatId,
           createdAt: message.createdAt,
           participants: [auth.currentUser.uid, message.user._id],
@@ -108,60 +119,73 @@ export default function StartChat({ navigation }) {
         });
       }
     } catch (error) {
-      console.error('Error updating or creating chat: ', error);
+      console.error("Error updating or creating chat: ", error);
     }
   };
 
   const renderChatListItem = ({ item }) => (
-  <TouchableOpacity
-    onPress={() => {
-      // Navigate to the chat screen with the selected participant
-      navigation.navigate('Chat', { chatId: item.chatId });
-    }}
-  >
-    <View style={{ padding: 16 }}>
-      <Avatar
-        uri={item.lastMessage.user?.avatar}
-        size={40} // Adjust the size according to your design
-      />
-      <Text>{item.lastMessage.user?._id}</Text>
-      <Text>{item.lastMessage.text}</Text>
-    </View>
-  </TouchableOpacity>
-);  
+    <TouchableOpacity
+      onPress={() => {
+        navigation.navigate("Chat", { chatId: item.chatId });
+      }}
+    >
+      <View style={styles.chatListItem}>
+        <Avatar
+          uri={item.lastMessage.user?.avatar}
+          size={40}
+        />
+        <View style={styles.textContainer}>
+          <Text style={styles.userName}>{item.lastMessage.user?._id}</Text>
+          <Text>{item.lastMessage.text}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
-    <View style={{ flex: 1 }}>
-      {/* Search bar */}
+    <View style={styles.container}>
       <TextInput
+        style={styles.searchBar}
         placeholder="Search for a user..."
         value={searchText}
         onChangeText={(text) => setSearchText(text)}
       />
-
-      {/* Recent Chats List */}
       <FlatList
+        style={styles.chatList}
         data={recentChats}
         renderItem={renderChatListItem}
         keyExtractor={(item) => item.chatId}
       />
-
-      {/* GiftedChat component */}
-      <GiftedChat
-        messages={messages}
-        onSend={onSend}
-        user={{
-          _id: auth?.currentUser?.uid,
-          avatar: 'https://i.pravatar.cc/300', // Default avatar if user avatar is not available
-        }}
-        renderAvatar={(props) => (
-          <Avatar
-            {...props}
-            uri={props.currentMessage.user.avatar}
-            size={40} // Adjust the size according to your design
-          />
-        )}
-      />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.lightGray,
+  },
+  searchBar: {
+    height: 40,
+    margin: 10,
+    paddingLeft: 10,
+    backgroundColor: colors.white,
+    borderRadius: 5,
+  },
+  chatList: {
+    flex: 1,
+  },
+  chatListItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.lightGray,
+  },
+  textContainer: {
+    marginLeft: 10,
+  },
+  userName: {
+    fontWeight: "bold",
+  },
+});
