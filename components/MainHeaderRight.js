@@ -8,7 +8,7 @@ class MainHeaderRight extends Component {
   render() {
     return (
       <TouchableOpacity
-        onPress={() => this.props.nav.navigate("Chat")}
+        onPress={() => this.props.nav.navigate("StartChat")}
         style={styles.chatButton}
       >
         <EntypoIcon name="chat" color={colors.lightGray} />

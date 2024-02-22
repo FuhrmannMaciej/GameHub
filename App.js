@@ -17,6 +17,7 @@ import Search from "./screens/Search";
 import GameCategories from "./screens/GameCategories";
 import Groups from "./screens/Groups";
 import CreateNewGroup from "./screens/CreateNewGroup";
+import StartChat from "./screens/StartChat";
 
 const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
@@ -40,6 +41,7 @@ function HomeStack() {
       headerTitle: '',
     }}>
       <Stack.Screen name="Home" component={Home} />
+      <Stack.Screen name="StartChat" component={StartChat} />
       <Stack.Screen name="Chat" component={Chat} />
       <Stack.Screen name="CreateNewPost" component={CreateNewPost} />
       <Stack.Screen name="UserProfile" component={UserProfile} />
