@@ -11,8 +11,8 @@ import {
   FlatList,
   Text,
   StyleSheet,
+  ImageBackground,
 } from "react-native";
-import { GiftedChat, Avatar } from "react-native-gifted-chat";
 import {
   collection,
   addDoc,
@@ -22,7 +22,8 @@ import {
   getDocs,
 } from "firebase/firestore";
 import { signOut } from "firebase/auth";
-import { auth, database } from "../config/firebase";
+import { auth, database, storage } from "../config/firebase";
+import { ref, getDownloadURL } from "firebase/storage";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "../colors";
 
@@ -30,6 +31,7 @@ export default function StartChat({ navigation }) {
   const [messages, setMessages] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [recentChats, setRecentChats] = useState([]);
+  const [avatar, setAvatar] = useState("");
 
   const onSignOut = () => {
     signOut(auth).catch((error) => console.log("Error logging out: ", error));
@@ -123,6 +125,27 @@ export default function StartChat({ navigation }) {
     }
   };
 
+  const fetchAvatar = async (userId) => {
+    try {
+      const avatarPath = `avatars/${userId}`;
+      const storageRef = ref(storage, avatarPath);
+      const url = await getDownloadURL(storageRef);
+      setAvatar(url);
+    } catch (error) {
+      setAvatar("");
+    }
+  };
+
+  useEffect(() => {
+    // Fetch avatar for the first chat item
+    if (recentChats.length > 0) {
+      const userId = recentChats[0].chatId.split('_').find(id => id !== auth.currentUser.uid);
+      if (userId) {
+        fetchAvatar(userId);
+      }
+    }
+  }, [recentChats]);
+
   const renderChatListItem = ({ item }) => (
     <TouchableOpacity
       onPress={() => {
@@ -130,9 +153,9 @@ export default function StartChat({ navigation }) {
       }}
     >
       <View style={styles.chatListItem}>
-        <Avatar
-          uri={item.lastMessage.user?.avatar}
-          size={40}
+        <ImageBackground
+          source={{ uri: avatar }}
+          style={styles.avatarImage}
         />
         <View style={styles.textContainer}>
           <Text style={styles.userName}>{item.lastMessage.user?._id}</Text>
@@ -187,5 +210,10 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontWeight: "bold",
+  },
+  avatarImage: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
   },
 });
