@@ -20,6 +20,8 @@ import {
   query,
   onSnapshot,
   getDocs,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { auth, database, storage } from "../config/firebase";
@@ -28,7 +30,6 @@ import { AntDesign } from "@expo/vector-icons";
 import colors from "../colors";
 
 export default function StartChat({ navigation }) {
-  const [messages, setMessages] = useState([]);
   const [searchText, setSearchText] = useState("");
   const [recentChats, setRecentChats] = useState([]);
   const [avatar, setAvatar] = useState("");
@@ -58,14 +59,41 @@ export default function StartChat({ navigation }) {
         const collectionRef = collection(database, "chats");
         const q = query(collectionRef, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
-
-        setRecentChats(
-          querySnapshot.docs.map((doc) => ({
-            chatId: doc.id,
-            participants: doc.data().participants,
-            lastMessage: doc.data().lastMessage,
-          }))
+    
+        const mappedChats = await Promise.all(
+          querySnapshot.docs.map(async (doc) => {
+            const participants = doc.data().participants;
+            const lastMessage = doc.data().lastMessage;
+    
+            // Fetch user data for each participant
+            const participantNames = await Promise.all(
+              participants.map(async (userId) => {
+                try {
+                  const userDocRef = doc(database, "gamers", userId);
+                  const userDocSnap = await getDoc(userDocRef);
+    
+                  if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    return `${userData.firstName} ${userData.lastName}`;
+                  } else {
+                    return null;
+                  }
+                } catch (error) {
+                  console.error("Error fetching user data: ", error);
+                  return null;
+                }
+              })
+            );
+    
+            return {
+              chatId: doc.id,
+              participants: participantNames,
+              lastMessage: lastMessage,
+            };
+          })
         );
+    
+        setRecentChats(mappedChats);
       } catch (error) {
         console.error("Error fetching chats: ", error);
       }
@@ -153,14 +181,8 @@ export default function StartChat({ navigation }) {
       }}
     >
       <View style={styles.chatListItem}>
-        <ImageBackground
-          source={{ uri: avatar }}
-          style={styles.avatarImage}
-        />
-        <View style={styles.textContainer}>
-          <Text style={styles.userName}>{item.lastMessage.user?._id}</Text>
-          <Text>{item.lastMessage.text}</Text>
-        </View>
+        <Text style={styles.userName}>{item.participants[0]}</Text>
+        <Text>{item.lastMessage.text}</Text>
       </View>
     </TouchableOpacity>
   );

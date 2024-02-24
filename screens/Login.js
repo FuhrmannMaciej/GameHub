@@ -5,13 +5,13 @@ import {
   View,
   StatusBar,
   TextInput,
-  SafeAreaView,
   TouchableOpacity,
   Alert
 } from "react-native";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
 import colors from "../colors";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");

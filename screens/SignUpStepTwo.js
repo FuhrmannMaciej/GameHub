@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, Text, View, Button, TextInput, Image, SafeAreaView, TouchableOpacity, StatusBar, Alert } from "react-native";
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, StatusBar, Alert } from "react-native";
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, database } from '../config/firebase';
 import colors from '../colors';
 import { setDoc, collection, doc } from 'firebase/firestore';
 import { useRoute } from '@react-navigation/native';
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUpStepTwo({ navigation }) {
 

@@ -4,13 +4,13 @@ import {
   Text,
   View,
   TextInput,
-  SafeAreaView,
   TouchableOpacity,
   Platform,
   LogBox,
 } from "react-native";
 import colors from "../colors";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 
 export default function SignUpStepOne({ navigation }) {
