@@ -28,10 +28,10 @@ export default function StartChat({ navigation }) {
         <View style={{ marginLeft: 10, flexDirection: "row" }}>
           <TouchableOpacity
           style={styles.backButton}
-                onPress={() => this.props.nav.navigate("Home")}>
+                onPress={() => navigation.navigate("Home")}>
           <EntypoIcon name="arrow-long-left" color={colors.lightGray} />
         </TouchableOpacity>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.lightGray, marginLeft: 20 }}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.lightGray, marginLeft: 20, marginTop: 10, marginBottom: 10, }}>
             Recent Chats
           </Text>
         </View>
@@ -229,4 +229,12 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 10,
   },
+  backButton: {
+    marginLeft: 10,
+    marginTop: 10,
+    marginBottom: 10,
+    marginRight: 10,
+    width: 30,
+    height: 30,
+},
 });

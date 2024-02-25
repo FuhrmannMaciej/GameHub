@@ -1,11 +1,13 @@
 import React, { useState, useLayoutEffect, useCallback, useEffect } from 'react';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, View, Text, StyleSheet } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
 import { collection, addDoc, orderBy, query, onSnapshot, where } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { auth, database } from '../config/firebase';
 import { AntDesign } from '@expo/vector-icons';
 import colors from '../colors';
+import EntypoIcon from "../components/EntypoIcon";
+
 
 export default function Chat({ navigation, route }) {
   const [messages, setMessages] = useState([]);
@@ -16,13 +18,17 @@ export default function Chat({ navigation, route }) {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      headerRight: () => (
-        <TouchableOpacity
-          style={{ marginRight: 10 }}
-          onPress={onSignOut}
-        >
-          <AntDesign name="logout" size={24} color={colors.gray} style={{ marginRight: 10 }} />
+      headerLeft: () => (
+        <View style={{ marginLeft: 10, flexDirection: "row" }}>
+          <TouchableOpacity
+          style={styles.backButton}
+                onPress={() => navigation.navigate("StartChat")}>
+          <EntypoIcon name="arrow-long-left" color={colors.lightGray} />
         </TouchableOpacity>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.lightGray, marginLeft: 20, marginTop: 10, marginBottom: 10, }}>
+            Chat with {route.params.recipient.userName}
+          </Text>
+        </View>
       ),
     });
   }, [navigation]);
@@ -87,3 +93,14 @@ export default function Chat({ navigation, route }) {
     />
   );
 }
+
+const styles = StyleSheet.create({
+  backButton: {
+    marginLeft: 10,
+    marginTop: 10,
+    marginBottom: 10,
+    marginRight: 10,
+    width: 30,
+    height: 30,
+},
+});
