@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useCallback } from "react";
 import { TouchableOpacity, View, TextInput, FlatList, Text, StyleSheet, ImageBackground } from "react-native";
-import { collection, addDoc, orderBy, query, onSnapshot, getDocs, doc, getDoc } from "firebase/firestore";
+import { collection, addDoc, orderBy, query, onSnapshot, getDocs, doc, getDoc, where } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { auth, database, storage } from "../config/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
@@ -43,7 +43,8 @@ export default function StartChat({ navigation }) {
     const fetchChats = async () => {
       try {
         const collectionRef = collection(database, "chats");
-        const q = query(collectionRef, orderBy("createdAt", "desc"));
+        const participantQuery = query(collectionRef, where("participants", "array-contains", auth.currentUser.uid));
+        const q = query(participantQuery, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
 
         const mappedChats = await Promise.all(

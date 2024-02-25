@@ -12,7 +12,8 @@ import * as ImagePicker from "expo-image-picker";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { storage } from "../config/firebase";
 import { ImageBackground } from "react-native";
-import { collection, query, getDocs, where } from "firebase/firestore";
+import { collection, query, getDocs, where, addDoc } from "firebase/firestore";
+import EntypoIcon from "../components/EntypoIcon";
 
 const UserProfile = ({ navigation, route }) => {
   const userId = route.params.userId || auth.currentUser.uid;
@@ -60,8 +61,6 @@ const UserProfile = ({ navigation, route }) => {
               })
             );
             
-            
-
             setUserInfo({
               ...userData,
               dateOfBirth,
@@ -154,6 +153,34 @@ const UserProfile = ({ navigation, route }) => {
     });
   };
 
+  const createChatId = (userId1, userId2) => {
+    const sortedIds = [userId1, userId2];
+    return `${sortedIds[0]}_${sortedIds[1]}`;
+  };
+
+  const handleChatButtonClick = async () => {
+    try {
+      const chatId = createChatId(auth.currentUser.uid, userId);
+      const participants = [auth.currentUser.uid, userId];
+
+      // Create a reference to the "chats" collection
+      const chatsCollectionRef = collection(database, "chats");
+
+      // Add a document to the "chats" collection
+      await addDoc(chatsCollectionRef, {
+        chatId,
+        createdAt: new Date(),
+        participants,
+        lastMessage: null,
+      });
+
+      // Navigate to the Chat screen
+      navigation.navigate("StartChat");
+    } catch (error) {
+      console.error("Error creating chat:", error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={colors.primaryDark} />
@@ -170,12 +197,11 @@ const UserProfile = ({ navigation, route }) => {
           {userInfo?.firstName} {userInfo?.lastName}
         </Text>
         <View style={styles.chatAndSettings}>
-          <TouchableOpacity style={styles.chatButton}
-          onPress={() => {
-            navigation.navigate("Chat", { chatId: item.chatId, participants: item.participants , recipient: item.recipient});
-          }}>
-            <EntypoIcon name="chat" color={colors.darkGrey} />
-          </TouchableOpacity>
+        {userId !== auth.currentUser.uid && (
+            <TouchableOpacity style={styles.chatButton} onPress={handleChatButtonClick}>
+              <EntypoIcon name="chat" color={colors.darkGrey} />
+            </TouchableOpacity>
+          )}
           {/* <TouchableOpacity style={styles.settingsButton}>
             <EntypoIcon name="dots-three-horizontal" color={colors.darkGrey} />
           </TouchableOpacity>
