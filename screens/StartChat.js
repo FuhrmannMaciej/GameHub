@@ -61,9 +61,9 @@ export default function StartChat({ navigation }) {
         const querySnapshot = await getDocs(q);
     
         const mappedChats = await Promise.all(
-          querySnapshot.docs.map(async (doc) => {
-            const participants = doc.data().participants;
-            const lastMessage = doc.data().lastMessage;
+          querySnapshot.docs.map(async (document) => {
+            const participants = document.data().participants;
+            const lastMessage = document.data().lastMessage;
     
             // Fetch user data for each participant
             const participantNames = await Promise.all(
@@ -86,7 +86,7 @@ export default function StartChat({ navigation }) {
             );
     
             return {
-              chatId: doc.id,
+              chatId: document.id,
               participants: participantNames,
               lastMessage: lastMessage,
             };
@@ -181,12 +181,18 @@ export default function StartChat({ navigation }) {
       }}
     >
       <View style={styles.chatListItem}>
-        <Text style={styles.userName}>{item.participants[0]}</Text>
-        <Text>{item.lastMessage.text}</Text>
+        <ImageBackground
+          source={{ uri: avatar }}
+          style={styles.avatarImage}
+        />
+        <View style={styles.textContainer}>
+          <Text style={styles.userName}>{item.participants[0]}</Text>
+          <Text style={styles.lastMessage}>{item.lastMessage.text}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
-
+  
   return (
     <View style={styles.container}>
       <TextInput
@@ -232,10 +238,17 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontWeight: "bold",
+    fontSize: 16,
+    color: colors.black,
+  },
+  lastMessage: {
+    color: colors.gray,
   },
   avatarImage: {
     width: 40,
     height: 40,
     borderRadius: 20,
+    marginRight: 10,
   },
 });
+
