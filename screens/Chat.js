@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect, useCallback, useEffect } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
-import { collection, addDoc, orderBy, query, onSnapshot } from 'firebase/firestore';
+import { collection, addDoc, orderBy, query, onSnapshot, where } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { auth, database } from '../config/firebase';
 import { AntDesign } from '@expo/vector-icons';
@@ -28,12 +28,15 @@ export default function Chat({ navigation, route }) {
   }, [navigation]);
 
   useLayoutEffect(() => {
-    const { chatId } = route.params; // Access params directly from route
-
+    const { chatId } = route.params;
+  
     const collectionRef = collection(database, 'messages');
-    const q = query(collectionRef, orderBy('createdAt', 'desc'));
-
-    const unsubscribe = onSnapshot(q, querySnapshot => {
+  
+    const chatIdQuery = query(collectionRef, where('chatId', '==', chatId));
+  
+    const orderedQuery = query(chatIdQuery, orderBy('createdAt', 'desc'));
+  
+    const unsubscribe = onSnapshot(orderedQuery, querySnapshot => {
       setMessages(
         querySnapshot.docs.map(doc => ({
           _id: doc.data()._id,
@@ -44,7 +47,7 @@ export default function Chat({ navigation, route }) {
         }))
       );
     });
-
+  
     return () => unsubscribe();
   }, [route]);
 

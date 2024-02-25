@@ -6,6 +6,8 @@ import { auth, database, storage } from "../config/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
 import { AntDesign } from "@expo/vector-icons";
 import colors from "../colors";
+import EntypoIcon from "../components/EntypoIcon";
+
 
 export default function StartChat({ navigation }) {
   const [searchText, setSearchText] = useState("");
@@ -21,6 +23,18 @@ export default function StartChat({ navigation }) {
         <TouchableOpacity style={{ marginRight: 10 }} onPress={onSignOut}>
           <AntDesign name="logout" size={24} color={colors.gray} style={{ marginRight: 10 }} />
         </TouchableOpacity>
+      ),
+      headerLeft: () => (
+        <View style={{ marginLeft: 10, flexDirection: "row" }}>
+          <TouchableOpacity
+          style={styles.backButton}
+                onPress={() => this.props.nav.navigate("Home")}>
+          <EntypoIcon name="arrow-long-left" color={colors.lightGray} />
+        </TouchableOpacity>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.lightGray, marginLeft: 20 }}>
+            Recent Chats
+          </Text>
+        </View>
       ),
     });
   }, [navigation]);
