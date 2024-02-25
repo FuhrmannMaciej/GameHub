@@ -1,28 +1,6 @@
-import React, {
-  useState,
-  useEffect,
-  useLayoutEffect,
-  useCallback,
-} from "react";
-import {
-  TouchableOpacity,
-  View,
-  TextInput,
-  FlatList,
-  Text,
-  StyleSheet,
-  ImageBackground,
-} from "react-native";
-import {
-  collection,
-  addDoc,
-  orderBy,
-  query,
-  onSnapshot,
-  getDocs,
-  doc,
-  getDoc,
-} from "firebase/firestore";
+import React, { useState, useEffect, useLayoutEffect, useCallback } from "react";
+import { TouchableOpacity, View, TextInput, FlatList, Text, StyleSheet, ImageBackground } from "react-native";
+import { collection, addDoc, orderBy, query, onSnapshot, getDocs, doc, getDoc } from "firebase/firestore";
 import { signOut } from "firebase/auth";
 import { auth, database, storage } from "../config/firebase";
 import { ref, getDownloadURL } from "firebase/storage";
@@ -32,7 +10,6 @@ import colors from "../colors";
 export default function StartChat({ navigation }) {
   const [searchText, setSearchText] = useState("");
   const [recentChats, setRecentChats] = useState([]);
-  const [avatar, setAvatar] = useState("");
 
   const onSignOut = () => {
     signOut(auth).catch((error) => console.log("Error logging out: ", error));
@@ -42,12 +19,7 @@ export default function StartChat({ navigation }) {
     navigation.setOptions({
       headerRight: () => (
         <TouchableOpacity style={{ marginRight: 10 }} onPress={onSignOut}>
-          <AntDesign
-            name="logout"
-            size={24}
-            color={colors.gray}
-            style={{ marginRight: 10 }}
-          />
+          <AntDesign name="logout" size={24} color={colors.gray} style={{ marginRight: 10 }} />
         </TouchableOpacity>
       ),
     });
@@ -59,22 +31,23 @@ export default function StartChat({ navigation }) {
         const collectionRef = collection(database, "chats");
         const q = query(collectionRef, orderBy("createdAt", "desc"));
         const querySnapshot = await getDocs(q);
-    
+
         const mappedChats = await Promise.all(
           querySnapshot.docs.map(async (document) => {
             const participants = document.data().participants;
             const lastMessage = document.data().lastMessage;
-    
+
             // Fetch user data for each participant
-            const participantNames = await Promise.all(
+            const participantData = await Promise.all(
               participants.map(async (userId) => {
                 try {
                   const userDocRef = doc(database, "gamers", userId);
                   const userDocSnap = await getDoc(userDocRef);
-    
+                  
                   if (userDocSnap.exists()) {
                     const userData = userDocSnap.data();
-                    return `${userData.firstName} ${userData.lastName}`;
+                    const avatar = await fetchAvatar(userId);
+                    return { userId, userName: `${userData.firstName} ${userData.lastName}`, avatar };
                   } else {
                     return null;
                   }
@@ -84,15 +57,16 @@ export default function StartChat({ navigation }) {
                 }
               })
             );
-    
+            const recipient = participantData.find((participant) => participant.userId !== auth.currentUser.uid);
             return {
               chatId: document.id,
-              participants: participantNames,
+              participants: participantData,
               lastMessage: lastMessage,
+              recipient: recipient,
             };
           })
         );
-    
+
         setRecentChats(mappedChats);
       } catch (error) {
         console.error("Error fetching chats: ", error);
@@ -104,12 +78,11 @@ export default function StartChat({ navigation }) {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, []); // Empty dependency array to run the effect only once
 
   const onSend = useCallback(async (messages = []) => {
     const { _id, createdAt, text, user } = messages[0];
-    const chatId =
-      messages[0].chatId || createChatId(auth.currentUser.uid, user._id);
+    const chatId = messages[0].chatId || createChatId(auth.currentUser.uid, user._id);
 
     try {
       await addDoc(collection(database, "messages"), {
@@ -158,41 +131,33 @@ export default function StartChat({ navigation }) {
       const avatarPath = `avatars/${userId}`;
       const storageRef = ref(storage, avatarPath);
       const url = await getDownloadURL(storageRef);
-      setAvatar(url);
+      return url;
     } catch (error) {
-      setAvatar("");
+      return "";
     }
   };
-
-  useEffect(() => {
-    // Fetch avatar for the first chat item
-    if (recentChats.length > 0) {
-      const userId = recentChats[0].chatId.split('_').find(id => id !== auth.currentUser.uid);
-      if (userId) {
-        fetchAvatar(userId);
-      }
-    }
-  }, [recentChats]);
 
   const renderChatListItem = ({ item }) => (
     <TouchableOpacity
       onPress={() => {
-        navigation.navigate("Chat", { chatId: item.chatId });
+        navigation.navigate("Chat", { chatId: item.chatId, participants: item.participants , recipient: item.recipient});
       }}
     >
       <View style={styles.chatListItem}>
         <ImageBackground
-          source={{ uri: avatar }}
+          source={{ uri: item.recipient.avatar || 'default_avatar_url' }}
           style={styles.avatarImage}
         />
         <View style={styles.textContainer}>
-          <Text style={styles.userName}>{item.participants[0]}</Text>
-          <Text style={styles.lastMessage}>{item.lastMessage.text}</Text>
+          <Text style={styles.userName}>
+            {item.recipient.userName}
+          </Text>
+          {/* <Text style={styles.lastMessage}>{item.lastMessage.text}</Text> */}
         </View>
       </View>
     </TouchableOpacity>
   );
-  
+
   return (
     <View style={styles.container}>
       <TextInput
@@ -251,4 +216,3 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
 });
-
