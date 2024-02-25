@@ -94,52 +94,6 @@ export default function StartChat({ navigation }) {
     };
   }, []); // Empty dependency array to run the effect only once
 
-  const onSend = useCallback(async (messages = []) => {
-    const { _id, createdAt, text, user } = messages[0];
-    const chatId = messages[0].chatId || createChatId(auth.currentUser.uid, user._id);
-
-    try {
-      await addDoc(collection(database, "messages"), {
-        _id,
-        createdAt,
-        text,
-        user,
-        chatId,
-      });
-
-      await updateOrCreateChat(chatId, messages[0]);
-    } catch (error) {
-      console.error("Error sending message: ", error);
-    }
-  }, []);
-
-  const createChatId = (userId1, userId2) => {
-    const sortedIds = [userId1, userId2].sort();
-    return `${sortedIds[0]}_${sortedIds[1]}`;
-  };
-
-  const updateOrCreateChat = async (chatId, message) => {
-    try {
-      const chatRef = collection(database, "chats").doc(chatId);
-      const chatDoc = await chatRef.get();
-
-      if (chatDoc.exists) {
-        await chatRef.update({
-          lastMessage: message,
-        });
-      } else {
-        await addDoc(collection(database, "chats"), {
-          chatId,
-          createdAt: message.createdAt,
-          participants: [auth.currentUser.uid, message.user._id],
-          lastMessage: message,
-        });
-      }
-    } catch (error) {
-      console.error("Error updating or creating chat: ", error);
-    }
-  };
-
   const fetchAvatar = async (userId) => {
     try {
       const avatarPath = `avatars/${userId}`;
@@ -174,14 +128,17 @@ export default function StartChat({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <TextInput
+      {/* <TextInput
         style={styles.searchBar}
         placeholder="Search for a user..."
         value={searchText}
         onChangeText={(text) => setSearchText(text)}
-      />
+      /> */}
       <FlatList
         style={styles.chatList}
+        ItemSeparatorComponent={() => (
+          <View style={{ height: 5, backgroundColor: colors.gray }} />
+        )}
         data={recentChats}
         renderItem={renderChatListItem}
         keyExtractor={(item) => item.chatId}

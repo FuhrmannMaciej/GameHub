@@ -169,14 +169,18 @@ const UserProfile = ({ navigation, route }) => {
         <Text style={styles.userName}>
           {userInfo?.firstName} {userInfo?.lastName}
         </Text>
-        {/* <View style={styles.chatAndSettings}>
-          <TouchableOpacity style={styles.chatButton}>
+        <View style={styles.chatAndSettings}>
+          <TouchableOpacity style={styles.chatButton}
+          onPress={() => {
+            navigation.navigate("Chat", { chatId: item.chatId, participants: item.participants , recipient: item.recipient});
+          }}>
             <EntypoIcon name="chat" color={colors.darkGrey} />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingsButton}>
+          {/* <TouchableOpacity style={styles.settingsButton}>
             <EntypoIcon name="dots-three-horizontal" color={colors.darkGrey} />
           </TouchableOpacity>
-        </View> */}
+           */}
+        </View>
         <View style={styles.userInfo}>
           <Text style={styles.userInfoText}>Email: {userInfo?.email}</Text>
           <Text style={styles.userInfoText}>

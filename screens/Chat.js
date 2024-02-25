@@ -4,7 +4,6 @@ import { GiftedChat } from 'react-native-gifted-chat';
 import { collection, addDoc, orderBy, query, onSnapshot, where } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { auth, database } from '../config/firebase';
-import { AntDesign } from '@expo/vector-icons';
 import colors from '../colors';
 import EntypoIcon from "../components/EntypoIcon";
 
