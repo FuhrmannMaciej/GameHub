@@ -18,9 +18,8 @@ import {
   arrayUnion,
   getDoc,
 } from "firebase/firestore";
-import { database } from "../config/firebase";
+import { database, auth } from "../config/firebase";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { auth } from "../config/firebase";
 import GroupsHeaderLeft from "../components/groupsPage/GroupsHeaderLeft";
 import GroupsHeaderRight from "../components/groupsPage/GroupsHeaderRight";
 import { useIsFocused } from "@react-navigation/native";

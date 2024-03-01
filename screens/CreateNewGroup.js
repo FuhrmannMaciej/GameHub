@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, TextInput, StyleSheet, Button} from "react-native";
+import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import colors from "../colors";
-import { collection, getDocs, query, where, orderBy, limit, addDoc } from "firebase/firestore";
-import { auth, database } from "../config/firebase";
+import { collection, getDocs} from "firebase/firestore";
+import { database } from "../config/firebase";
 import { Picker } from "@react-native-picker/picker";
-import { TouchableOpacity } from "react-native-gesture-handler";
 
-const CreateNewGroup = ({navigation}) => {
+const CreateNewGroup = ({ navigation }) => {
   const [groupName, setGroupName] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedGroupType, setSelectedGroupType] = useState("public");
   const [gameCategories, setGameCategories] = useState([]);
 
   useEffect(() => {
@@ -26,31 +26,26 @@ const CreateNewGroup = ({navigation}) => {
     fetchGameCategories();
   }, []);
 
-  const handleCreateGroup = async () => {
-    try {
-      const lastGroupQuery = query(collection(database, "groups"), orderBy("groupId", "desc"), limit(1));
-      const lastGroupSnapshot = await getDocs(lastGroupQuery);
-  
-      let newGroupId = 1;
-      if (!lastGroupSnapshot.empty) {
-        const lastGroupData = lastGroupSnapshot.docs[0].data();
-        newGroupId = lastGroupData.groupId + 1;
-      }
-  
-      const newGroupData = {
-        groupId: newGroupId,
-        groupName: groupName,
+  const navigateToGroupTypeScreen = () => {
+    // Navigate to a screen based on the selected group type
+    if (selectedGroupType === "public") {
+      navigation.navigate("PublicGroupDetails", {
+        groupName,
         gameCategory: selectedCategory,
-        joinedPlayers: [auth.currentUser.uid],
-      };
-  
-      await addDoc(collection(database, `groups`), {
-        ...newGroupData,
+        gameCategories: gameCategories,
+        description: "",
+        maxPlayers: "",
+        joiningRequirements: "",
       });
-  
-      navigation.goBack();
-    } catch (error) {
-      console.error("Error creating group: ", error);
+    } else {
+      navigation.navigate("PrivateGroupDetails", {
+        groupName,
+        gameCategory: selectedCategory,
+        gameCategories: gameCategories,
+        description: "",
+        maxPlayers: "",
+        joiningRequirements: "",
+      });
     }
   };
 
@@ -69,17 +64,27 @@ const CreateNewGroup = ({navigation}) => {
         onValueChange={(itemValue) => setSelectedCategory(itemValue)}
       >
         {gameCategories.map((category) => (
-          <Picker.Item key={category.categoryId} label={category.categoryName} value={category.categoryId} />
+          <Picker.Item
+            key={category.categoryId}
+            label={category.categoryName}
+            value={category.categoryId}
+          />
         ))}
       </Picker>
 
-      <TouchableOpacity style={styles.button} onPress={handleCreateGroup}>
-            <Text style={styles.buttonText}>
-              {" "}
-              Create Group
-            </Text>
-          </TouchableOpacity>
+      {/* Added group type selection */}
+      <Text style={styles.label}>Select Group Type</Text>
+      <Picker
+        selectedValue={selectedGroupType}
+        onValueChange={(itemValue) => setSelectedGroupType(itemValue)}
+      >
+        <Picker.Item label="Public" value="public" />
+        <Picker.Item label="Private" value="private" />
+      </Picker>
 
+      <TouchableOpacity style={styles.button} onPress={navigateToGroupTypeScreen}>
+        <Text style={styles.buttonText}>Next</Text>
+      </TouchableOpacity>
     </View>
   );
 };
