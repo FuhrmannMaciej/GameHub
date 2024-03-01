@@ -6,6 +6,9 @@ import {
   Text,
   TouchableOpacity,
   Alert,
+  Modal,
+  TextInput,
+  Button,
 } from "react-native";
 import colors from "../colors";
 import {
@@ -26,6 +29,9 @@ import { useIsFocused } from "@react-navigation/native";
 
 const Groups = ({ navigation }) => {
   const [groups, setGroups] = useState([]);
+  const [isPasswordPromptVisible, setIsPasswordPromptVisible] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState(null);
   const isFocused = useIsFocused();
 
   const fetchGroups = async () => {
@@ -92,7 +98,7 @@ const Groups = ({ navigation }) => {
     });
   }, [navigation]);
 
-  const handleGroupJoin = async (groupId, maxPlayers) => {
+  const handleGroupJoin = async (groupId, maxPlayers, groupType) => {
     try {
       const groupRef = collection(database, `groups`);
       const groupQuerySnapshot = await getDocs(
@@ -107,14 +113,11 @@ const Groups = ({ navigation }) => {
         if (groupData.joinedPlayers.includes(auth.currentUser.uid)) {
           Alert.alert("Already Joined", "You have already joined this group.");
         } else {
-          if (groupData.joinedPlayers.length < maxPlayers) {
-            await updateDoc(groupDoc.ref, {
-              joinedPlayers: arrayUnion(auth.currentUser.uid),
-            });
-
-            Alert.alert("Group Joined", "You've successfully joined the group!");
+          if (groupType === "private") {
+            setSelectedGroup(groupData);
+            setIsPasswordPromptVisible(true);
           } else {
-            Alert.alert("Group Full", "This group is already full.");
+            joinGroup(groupDoc, maxPlayers);
           }
         }
       } else {
@@ -128,6 +131,42 @@ const Groups = ({ navigation }) => {
     }
   };
 
+  const joinGroup = async (groupDoc, maxPlayers) => {
+    try {
+      const groupData = groupDoc.data();
+
+      if (groupData.joinedPlayers.length < maxPlayers) {
+        await updateDoc(groupDoc.ref, {
+          joinedPlayers: arrayUnion(auth.currentUser.uid),
+        });
+
+        Alert.alert("Group Joined", "You've successfully joined the group!");
+      } else {
+        Alert.alert("Group Full", "This group is already full.");
+      }
+    } catch (error) {
+      console.error("Error joining group: ", error);
+    }
+  };
+
+  const handlePasswordSubmit = () => {
+    const { password } = selectedGroup;
+
+    if (password === passwordInput) {
+      setIsPasswordPromptVisible(false);
+
+      joinGroup(selectedGroup, selectedGroup.maxPlayers);
+    } else {
+      Alert.alert("Incorrect Password", "The entered password is incorrect.");
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsPasswordPromptVisible(false);
+    setSelectedGroup(null);
+    setPasswordInput("");
+  };
+
   const renderItem = ({ item }) => (
     <View style={styles.groupItem}>
       <View>
@@ -135,17 +174,27 @@ const Groups = ({ navigation }) => {
         <Text style={styles.groupCategory}>
           Category: {item.gameCategoryName}
         </Text>
+        <Text style={styles.groupType}>
+          Type: {item.groupType === "public" ? "Public" : "Private"}
+        </Text>
         <Text style={styles.joinedPlayers}>
           Joined Players:{"\n"}
           {item.joinedPlayers.map((player) => `${player}\n`) || "None"}
         </Text>
         <Text style={styles.playerCounter}>
-          {item.joinedPlayers.length}/5 joined
+          {item.joinedPlayers.length}/{item.maxPlayers} joined
         </Text>
       </View>
       <TouchableOpacity
         style={styles.joinButton}
-        onPress={() => handleGroupJoin(item.groupId, 5)}
+        onPress={() => {
+          if (item.groupType === 'private') {
+            setSelectedGroup(item);
+            setIsPasswordPromptVisible(true);
+          } else {
+            handleGroupJoin(item.groupId, item.maxPlayers, item.groupType);
+          }
+        }}
       >
         <Text style={styles.joinButtonText}>Join</Text>
       </TouchableOpacity>
@@ -167,6 +216,26 @@ const Groups = ({ navigation }) => {
           )}
         />
       </SafeAreaView>
+
+      <Modal visible={isPasswordPromptVisible} animationType="fade" transparent={true}>
+        <View style={styles.passwordContainer}>
+          <View style={styles.passwordModal}>
+          <TouchableOpacity style={styles.closeButton} onPress={handleCloseModal}>
+            <Text style={styles.closeButtonText}>X</Text>
+          </TouchableOpacity>
+          <Text style={styles.modalTitle}>Enter Group Password</Text>
+          <TextInput
+            secureTextEntry
+            value={passwordInput}
+            onChangeText={setPasswordInput}
+            style={styles.passwordInput}
+          />
+          <TouchableOpacity style={styles.submitButton} onPress={handlePasswordSubmit}>
+            <Text style={styles.submitButtonText}>Submit</Text>
+          </TouchableOpacity>
+        </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -218,6 +287,55 @@ const styles = StyleSheet.create({
   playerCounter: {
     fontSize: 12,
     color: colors.white,
+  },
+  passwordContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  passwordModal: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 5,
+    maxHeight: "70%",
+    width: "80%",
+    overflow: "hidden",
+  },
+  closeButton: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    padding: 10,
+  },
+  closeButtonText: {
+    fontSize: 20,
+    color: colors.darkGrey,
+  },
+  modalTitle: {
+    fontSize: 18,
+    marginBottom: 10,
+    fontWeight: "bold",
+  },
+  passwordInput: {
+    height: 50,
+    borderColor: colors.darkGrey,
+    borderWidth: 1,
+    marginBottom: 16,
+    paddingHorizontal: 10,
+    width: "100%",
+  },
+  submitButton: {
+    backgroundColor: colors.primaryDark,
+    padding: 15,
+    borderRadius: 8,
+    width: "100%",
+    alignItems: "center",
+  },
+  submitButtonText: {
+    fontWeight: "bold", 
+    color: "#fff",
+    fontSize: 18,
   },
 });
 
