@@ -78,13 +78,23 @@ const Groups = ({ navigation }) => {
   };
 
   const getUsersName = async (joinedPlayers) => {
-    for (let i = 0; i < joinedPlayers.length; i++) {
-      const userRef = doc(database, "gamers", joinedPlayers[i]);
-      const userDoc = await getDoc(userRef);
-      const userData = userDoc.data();
-      joinedPlayers[i] = `${userData.firstName}`;
+    try {
+      if (Array.isArray(joinedPlayers)) {
+        for (let i = 0; i < joinedPlayers.length; i++) {
+          const userRef = doc(database, "gamers", joinedPlayers[i]);
+          const userDoc = await getDoc(userRef);
+          const userData = userDoc.data();
+          joinedPlayers[i] = `${userData.firstName}`;
+        }
+        return joinedPlayers;
+      } else {
+        console.error("Invalid joinedPlayers field or not an array.");
+        return [];
+      }
+    } catch (error) {
+      console.error("Error fetching user info: ", error);
+      return [];
     }
-    return joinedPlayers;
   };
 
   useEffect(() => {
@@ -114,7 +124,7 @@ const Groups = ({ navigation }) => {
           Alert.alert("Already Joined", "You have already joined this group.");
         } else {
           if (groupType === "private") {
-            setSelectedGroup(groupData);
+            setSelectedGroup(groupDoc);
             setIsPasswordPromptVisible(true);
           } else {
             joinGroup(groupDoc, maxPlayers);
@@ -133,16 +143,28 @@ const Groups = ({ navigation }) => {
 
   const joinGroup = async (groupDoc, maxPlayers) => {
     try {
+      console.log("groupDoc:", groupDoc);
+
       const groupData = groupDoc.data();
 
-      if (groupData.joinedPlayers.length < maxPlayers) {
-        await updateDoc(groupDoc.ref, {
-          joinedPlayers: arrayUnion(auth.currentUser.uid),
-        });
+      if (groupData && Array.isArray(groupData.joinedPlayers)) {
+        if (groupData.joinedPlayers.length < maxPlayers) {
+          const updatedJoinedPlayers = [
+            ...groupData.joinedPlayers,
+            auth.currentUser.uid,
+          ];
 
-        Alert.alert("Group Joined", "You've successfully joined the group!");
+          await updateDoc(groupDoc.ref, {
+            joinedPlayers: updatedJoinedPlayers,
+          });
+          Alert.alert("Group Joined", "You've successfully joined the group!");
+        } else {
+          Alert.alert("Group Full", "This group is already full.");
+        }
       } else {
-        Alert.alert("Group Full", "This group is already full.");
+        console.error(
+          "Invalid group data or joinedPlayers field is not an array."
+        );
       }
     } catch (error) {
       console.error("Error joining group: ", error);
@@ -150,17 +172,18 @@ const Groups = ({ navigation }) => {
   };
 
   const handlePasswordSubmit = () => {
-    const { password } = selectedGroup;
 
-    if (password === passwordInput) {
-      setIsPasswordPromptVisible(false);
-
-      joinGroup(selectedGroup, selectedGroup.maxPlayers);
-    } else {
-      Alert.alert("Incorrect Password", "The entered password is incorrect.");
-    }
+    const groupData = selectedGroup.data();
+  
+      if (groupData.password === passwordInput) {
+        setIsPasswordPromptVisible(false);
+  
+        joinGroup(selectedGroup, groupData.maxPlayers);
+      } else {
+        Alert.alert("Incorrect Password", "The entered password is incorrect.");
+      }
   };
-
+  
   const handleCloseModal = () => {
     setIsPasswordPromptVisible(false);
     setSelectedGroup(null);
@@ -188,12 +211,7 @@ const Groups = ({ navigation }) => {
       <TouchableOpacity
         style={styles.joinButton}
         onPress={() => {
-          if (item.groupType === 'private') {
-            setSelectedGroup(item);
-            setIsPasswordPromptVisible(true);
-          } else {
             handleGroupJoin(item.groupId, item.maxPlayers, item.groupType);
-          }
         }}
       >
         <Text style={styles.joinButtonText}>Join</Text>
@@ -217,23 +235,33 @@ const Groups = ({ navigation }) => {
         />
       </SafeAreaView>
 
-      <Modal visible={isPasswordPromptVisible} animationType="fade" transparent={true}>
+      <Modal
+        visible={isPasswordPromptVisible}
+        animationType="fade"
+        transparent={true}
+      >
         <View style={styles.passwordContainer}>
           <View style={styles.passwordModal}>
-          <TouchableOpacity style={styles.closeButton} onPress={handleCloseModal}>
-            <Text style={styles.closeButtonText}>X</Text>
-          </TouchableOpacity>
-          <Text style={styles.modalTitle}>Enter Group Password</Text>
-          <TextInput
-            secureTextEntry
-            value={passwordInput}
-            onChangeText={setPasswordInput}
-            style={styles.passwordInput}
-          />
-          <TouchableOpacity style={styles.submitButton} onPress={handlePasswordSubmit}>
-            <Text style={styles.submitButtonText}>Submit</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={handleCloseModal}
+            >
+              <Text style={styles.closeButtonText}>X</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Enter Group Password</Text>
+            <TextInput
+              secureTextEntry
+              value={passwordInput}
+              onChangeText={setPasswordInput}
+              style={styles.passwordInput}
+            />
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handlePasswordSubmit}
+            >
+              <Text style={styles.submitButtonText}>Submit</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </Modal>
     </View>
@@ -333,7 +361,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   submitButtonText: {
-    fontWeight: "bold", 
+    fontWeight: "bold",
     color: "#fff",
     fontSize: 18,
   },

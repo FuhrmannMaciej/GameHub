@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import colors from "../colors";
-import { database, auth,  } from "../config/firebase";
+import { database, auth } from "../config/firebase";
 import { getDocs, collection, addDoc, query, orderBy, limit } from "firebase/firestore";
 
 const PrivateGroupDetails = ({ route, navigation }) => {
@@ -11,21 +11,21 @@ const PrivateGroupDetails = ({ route, navigation }) => {
   const [requirements, setRequirements] = useState(joiningRequirements || "");
   const [password, setPassword] = useState("");
 
-const getCategoryNameById = (categoryId, categories) => {
-  const category = categories.find((c) => c.categoryId === categoryId);
-  return category ? category.categoryName : "";
-};
+  const getCategoryNameById = (categoryId, categories) => {
+    const category = categories.find((c) => c.categoryId === categoryId);
+    return category ? category.categoryName : "";
+  };
 
   const handleCreateGroup = async () => {
     try {
-        const lastGroupQuery = query(collection(database, "groups"), orderBy("groupId", "desc"), limit(1));
-        const lastGroupSnapshot = await getDocs(lastGroupQuery);
-    
-        let newGroupId = 1;
-        if (!lastGroupSnapshot.empty) {
-          const lastGroupData = lastGroupSnapshot.docs[0].data();
-          newGroupId = lastGroupData.groupId + 1;
-        }
+      const lastGroupQuery = query(collection(database, "groups"), orderBy("groupId", "desc"), limit(1));
+      const lastGroupSnapshot = await getDocs(lastGroupQuery);
+
+      let newGroupId = 1;
+      if (!lastGroupSnapshot.empty) {
+        const lastGroupData = lastGroupSnapshot.docs[0].data();
+        newGroupId = lastGroupData.groupId + 1;
+      }
 
       const newGroupData = {
         groupId: newGroupId,
@@ -33,10 +33,10 @@ const getCategoryNameById = (categoryId, categories) => {
         gameCategory,
         groupType: "private",
         description: groupDescription,
-        maxPlayers: maxPlayersCount,
+        maxPlayers: parseInt(maxPlayersCount, 10), // Parse maxPlayers as an integer
         joiningRequirements: requirements,
         password,
-        joinedPlayers: [auth.currentUser.uid]
+        joinedPlayers: [auth.currentUser.uid],
       };
 
       await addDoc(collection(database, "groups"), newGroupData);

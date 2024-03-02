@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from "react-native";
 import colors from "../colors";
-import { database, auth,  } from "../config/firebase";
+import { database, auth } from "../config/firebase";
 import { getDocs, collection, addDoc, query, orderBy, limit } from "firebase/firestore";
 
 const PublicGroupDetails = ({ route, navigation }) => {
@@ -9,16 +9,16 @@ const PublicGroupDetails = ({ route, navigation }) => {
   const [groupDescription, setGroupDescription] = useState(description || "");
   const [maxPlayersCount, setMaxPlayersCount] = useState(maxPlayers || "");
 
-const getCategoryNameById = (categoryId, categories) => {
-  const category = categories.find((c) => c.categoryId === categoryId);
-  return category ? category.categoryName : "";
-};
+  const getCategoryNameById = (categoryId, categories) => {
+    const category = categories.find((c) => c.categoryId === categoryId);
+    return category ? category.categoryName : "";
+  };
 
   const handleCreateGroup = async () => {
     try {
       const lastGroupQuery = query(collection(database, "groups"), orderBy("groupId", "desc"), limit(1));
       const lastGroupSnapshot = await getDocs(lastGroupQuery);
-  
+
       let newGroupId = 1;
       if (!lastGroupSnapshot.empty) {
         const lastGroupData = lastGroupSnapshot.docs[0].data();
@@ -31,9 +31,9 @@ const getCategoryNameById = (categoryId, categories) => {
         gameCategory: gameCategory,
         groupType: "public",
         description: groupDescription,
-        maxPlayers: maxPlayersCount,
+        maxPlayers: parseInt(maxPlayersCount, 10),
         joiningRequirements: joiningRequirements,
-        joinedPlayers: [auth.currentUser.uid]
+        joinedPlayers: [auth.currentUser.uid],
       };
 
       await addDoc(collection(database, "groups"), newGroupData);
@@ -69,7 +69,7 @@ const getCategoryNameById = (categoryId, categories) => {
       <Text style={styles.label}>Max Players</Text>
       <TextInput
         style={styles.input}
-        value={maxPlayersCount}
+        value={maxPlayersCount.toString()}
         onChangeText={(text) => setMaxPlayersCount(text)}
         keyboardType="numeric"
       />
