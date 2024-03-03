@@ -8,7 +8,6 @@ import {
   Alert,
   Modal,
   TextInput,
-  Button,
 } from "react-native";
 import colors from "../colors";
 import {
@@ -18,8 +17,8 @@ import {
   doc,
   updateDoc,
   where,
-  arrayUnion,
   getDoc,
+  QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { database, auth } from "../config/firebase";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -190,6 +189,30 @@ const Groups = ({ navigation }) => {
     setPasswordInput("");
   };
 
+  const handleGroupDetails = async (groupId, groupDetails ) => {
+    try {
+      const groupRef = collection(database, `groups`);
+      const groupQuerySnapshot = await getDocs(
+        query(groupRef, where("groupId", "==", groupId))
+      );
+
+      if (!groupQuerySnapshot.empty) {
+        const groupDoc = groupQuerySnapshot.docs[0];
+
+        const groupData = groupDoc.data();
+
+        if (groupData.joinedPlayers.includes(auth.currentUser.uid)) {
+          navigation.navigate("GroupDetails", { groupDetails });
+        } else {
+          Alert.alert("Cannot Access Details", "You are not part of this group.");
+        }
+      }
+    }
+    catch (error) {
+      console.error("Error fetching group details: ", error);
+  }
+  };
+  
   const renderItem = ({ item }) => (
     <View style={styles.groupItem}>
       <View>
@@ -200,13 +223,14 @@ const Groups = ({ navigation }) => {
         <Text style={styles.groupType}>
           Type: {item.groupType === "public" ? "Public" : "Private"}
         </Text>
-        <Text style={styles.joinedPlayers}>
-          Joined Players:{"\n"}
-          {item.joinedPlayers.map((player) => `${player}\n`) || "None"}
-        </Text>
-        <Text style={styles.playerCounter}>
-          {item.joinedPlayers.length}/{item.maxPlayers} joined
-        </Text>
+        {item.groupType === "private" && (
+          <Text style={styles.joiningRequirements}>
+            Joining Requirements: {item.joiningRequirements}
+          </Text>
+        )}
+            <Text style={styles.playerCounter}>
+              {item.joinedPlayers.length}/{item.maxPlayers} joined
+            </Text>
       </View>
       <View>
         <TouchableOpacity
@@ -219,19 +243,14 @@ const Groups = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.button, styles.detailsButton]}
-          onPress={() => {
-            if (item.joinedPlayers.includes(auth.currentUser.uid)) {
-              navigation.navigate("GroupDetails", { group: item });
-            } else {
-              Alert.alert("Cannot Access Details", "You are not part of this group.");
-            }
-          }}
+          onPress={() => handleGroupDetails(item.groupId, item)}
         >
           <Text style={styles.detailsButtonText}>Details</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
+  
   
 
   return (
@@ -298,7 +317,7 @@ const styles = StyleSheet.create({
   },
   groupName: {
     fontSize: 16,
-    color: colors.white,
+    color: colors.pri,
   },
   groupCategory: {
     fontSize: 14,
@@ -330,6 +349,7 @@ const styles = StyleSheet.create({
   playerCounter: {
     fontSize: 12,
     color: colors.white,
+    marginTop: 50,
   },
   passwordContainer: {
     flex: 1,
