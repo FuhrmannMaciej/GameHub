@@ -38,6 +38,19 @@ const PublicGroupCreate = ({ route, navigation }) => {
 
       await addDoc(collection(database, "groups"), newGroupData);
 
+      const initialMessage = {
+        _id: 1,
+        groupId: newGroupId,
+        createdAt: new Date(),
+        text: `Welcome to the group "${groupName}"!`,
+        user: {
+          _id: auth.currentUser.uid,
+          avatar: "",
+        },
+      };
+
+      await addDoc(collection(database, "groupChat"), initialMessage);
+
       navigation.navigate("Groups");
     } catch (error) {
       console.error("Error creating public group: ", error);

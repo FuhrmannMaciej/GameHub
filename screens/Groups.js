@@ -142,7 +142,6 @@ const Groups = ({ navigation }) => {
 
   const joinGroup = async (groupDoc, maxPlayers) => {
     try {
-      console.log("groupDoc:", groupDoc);
 
       const groupData = groupDoc.data();
 

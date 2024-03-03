@@ -5,11 +5,11 @@ import { collection, addDoc, orderBy, query, onSnapshot, where } from 'firebase/
 import { signOut } from 'firebase/auth';
 import { auth, database } from '../config/firebase';
 import colors from '../colors';
-import EntypoIcon from "../components/EntypoIcon";
+import EntypoIcon from '../components/EntypoIcon';
 
-
-export default function Chat({ navigation, route }) {
+export default function GroupChat({ navigation, route }) {
   const [messages, setMessages] = useState([]);
+  const groupDetails = route.params.groupDetails;
 
   const onSignOut = () => {
     signOut(auth).catch(error => console.log('Error logging out: ', error));
@@ -18,41 +18,41 @@ export default function Chat({ navigation, route }) {
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
-        <View style={{ marginLeft: 10, flexDirection: "row" }}>
+        <View style={{ marginLeft: 10, flexDirection: 'row' }}>
           <TouchableOpacity
-          style={styles.backButton}
-                onPress={() => navigation.navigate("StartChat")}>
-          <EntypoIcon name="arrow-long-left" color={colors.lightGray} />
-        </TouchableOpacity>
-          <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.lightGray, marginLeft: 20, marginTop: 10, marginBottom: 10, }}>
-            Chat with {route.params.recipient.userName}
+            style={styles.backButton}
+            onPress={() => navigation.navigate('Groups')}
+          >
+            <EntypoIcon name="arrow-long-left" color={colors.lightGray} />
+          </TouchableOpacity>
+          <Text style={styles.headerText}>
+            Group Chat: {groupDetails.groupName}
           </Text>
         </View>
       ),
     });
-  }, [navigation]);
+  }, [navigation, route]);
 
   useLayoutEffect(() => {
-    const { chatId } = route.params;
-  
-    const collectionRef = collection(database, 'messages');
-  
-    const chatIdQuery = query(collectionRef, where('chatId', '==', chatId));
-  
-    const orderedQuery = query(chatIdQuery, orderBy('createdAt', 'desc'));
-  
+
+    const collectionRef = collection(database, 'groupChat');
+
+    const groupIdQuery = query(collectionRef, where('groupId', '==', groupDetails.groupId));
+
+    const orderedQuery = query(groupIdQuery, orderBy('createdAt', 'desc'));
+
     const unsubscribe = onSnapshot(orderedQuery, querySnapshot => {
       setMessages(
         querySnapshot.docs.map(doc => ({
           _id: doc.data()._id,
-          chatId: doc.data().chatId,
+          groupId: doc.data().groupId,
           createdAt: doc.data().createdAt.toDate(),
           text: doc.data().text,
           user: doc.data().user,
         }))
       );
     });
-  
+
     return () => unsubscribe();
   }, [route]);
 
@@ -60,9 +60,9 @@ export default function Chat({ navigation, route }) {
     const sentMessage = newMessages[0];
 
     try {
-      await addDoc(collection(database, 'messages'), {
+      await addDoc(collection(database, 'groupChat'), {
         _id: sentMessage._id,
-        chatId: route.params.chatId,
+        groupId: groupDetails.groupId,
         createdAt: sentMessage.createdAt,
         text: sentMessage.text,
         user: sentMessage.user,
@@ -70,7 +70,7 @@ export default function Chat({ navigation, route }) {
     } catch (error) {
       console.error('Error sending message: ', error);
     }
-  }, []);
+  }, [route]);
 
   return (
     <GiftedChat
@@ -87,7 +87,7 @@ export default function Chat({ navigation, route }) {
       }}
       user={{
         _id: auth?.currentUser?.uid,
-        avatar: route.params.recipient.avatar,
+        avatar: "",
       }}
     />
   );
@@ -101,5 +101,13 @@ const styles = StyleSheet.create({
     marginRight: 10,
     width: 30,
     height: 30,
-},
+  },
+  headerText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: colors.lightGray,
+    marginLeft: 20,
+    marginTop: 10,
+    marginBottom: 10,
+  },
 });

@@ -33,13 +33,27 @@ const PrivateGroupCreate = ({ route, navigation }) => {
         gameCategory,
         groupType: "private",
         description: groupDescription,
-        maxPlayers: parseInt(maxPlayersCount, 10), // Parse maxPlayers as an integer
+        maxPlayers: parseInt(maxPlayersCount, 10),
         joiningRequirements: requirements,
         password,
         joinedPlayers: [auth.currentUser.uid],
       };
 
       await addDoc(collection(database, "groups"), newGroupData);
+
+      const initialMessage = {
+        _id: 1,
+        chatId: newGroupRef.id,
+        groupId: newGroupId,
+        createdAt: new Date(),
+        text: `Welcome to the group "${groupName}"!`,
+        user: {
+          _id: auth.currentUser.uid,
+          avatar: "",
+        },
+      };
+
+      await addDoc(collection(database, "groupChat"), initialMessage);
 
       navigation.navigate("Groups");
     } catch (error) {

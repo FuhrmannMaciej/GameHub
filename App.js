@@ -21,6 +21,7 @@ import StartChat from "./screens/StartChat";
 import PublicGroupCreate from "./screens/PublicGroupCreate";
 import PrivateGroupCreate from "./screens/PrivateGroupCreate";
 import GroupDetails from "./screens/GroupDetails";
+import GroupChat from "./screens/GroupChat";
 
 const Stack = createStackNavigator();
 const AuthenticatedUserContext = createContext({});
@@ -55,6 +56,7 @@ function HomeStack() {
       <Stack.Screen name="PublicGroupDetails" component={PublicGroupCreate} />
       <Stack.Screen name="PrivateGroupCreate" component={PrivateGroupCreate} />
       <Stack.Screen name="GroupDetails" component={GroupDetails} />
+      <Stack.Screen name="GroupChat" component={GroupChat} />
     </Stack.Navigator>
   )
 }
