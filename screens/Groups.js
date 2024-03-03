@@ -208,16 +208,31 @@ const Groups = ({ navigation }) => {
           {item.joinedPlayers.length}/{item.maxPlayers} joined
         </Text>
       </View>
-      <TouchableOpacity
-        style={styles.joinButton}
-        onPress={() => {
+      <View>
+        <TouchableOpacity
+          style={[styles.button, styles.joinButton]}
+          onPress={() => {
             handleGroupJoin(item.groupId, item.maxPlayers, item.groupType);
-        }}
-      >
-        <Text style={styles.joinButtonText}>Join</Text>
-      </TouchableOpacity>
+          }}
+        >
+          <Text style={styles.joinButtonText}>Join</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.detailsButton]}
+          onPress={() => {
+            if (item.joinedPlayers.includes(auth.currentUser.uid)) {
+              navigation.navigate("GroupDetails", { group: item });
+            } else {
+              Alert.alert("Cannot Access Details", "You are not part of this group.");
+            }
+          }}
+        >
+          <Text style={styles.detailsButtonText}>Details</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
+  
 
   return (
     <View style={styles.container}>
@@ -361,6 +376,35 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   submitButtonText: {
+    fontWeight: "bold",
+    color: "#fff",
+    fontSize: 18,
+  },
+  button: {
+    backgroundColor: colors.primary,
+    height: 38,
+    borderRadius: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    alignSelf: "center",
+    width: "120%",
+    marginTop: 50,
+  },
+
+  joinButton: {
+    backgroundColor: colors.primary,
+    marginTop: 0,
+  },
+
+  detailsButton: {
+    backgroundColor: colors.primary,
+  },
+  detailsButtonText: {
+    fontWeight: "bold",
+    color: "#fff",
+    fontSize: 18,
+  },
+  joinButtonText: {
     fontWeight: "bold",
     color: "#fff",
     fontSize: 18,

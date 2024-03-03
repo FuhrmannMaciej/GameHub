@@ -4,7 +4,7 @@ import colors from "../colors";
 import { database, auth } from "../config/firebase";
 import { getDocs, collection, addDoc, query, orderBy, limit } from "firebase/firestore";
 
-const PrivateGroupDetails = ({ route, navigation }) => {
+const PrivateGroupCreate = ({ route, navigation }) => {
   const { groupName, gameCategory, description, maxPlayers, joiningRequirements, gameCategories } = route.params;
   const [groupDescription, setGroupDescription] = useState(description || "");
   const [maxPlayersCount, setMaxPlayersCount] = useState(maxPlayers || "");
@@ -138,4 +138,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PrivateGroupDetails;
+export default PrivateGroupCreate;
