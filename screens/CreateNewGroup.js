@@ -29,7 +29,7 @@ const CreateNewGroup = ({ navigation }) => {
   const navigateToGroupTypeScreen = () => {
     // Navigate to a screen based on the selected group type
     if (selectedGroupType === "public") {
-      navigation.navigate("PublicGroupDetails", {
+      navigation.navigate("PublicGroupCreate", {
         groupName,
         gameCategory: selectedCategory,
         gameCategories: gameCategories,
@@ -38,7 +38,7 @@ const CreateNewGroup = ({ navigation }) => {
         joiningRequirements: "",
       });
     } else {
-      navigation.navigate("PrivateGroupDetails", {
+      navigation.navigate("PrivateGroupCreate", {
         groupName,
         gameCategory: selectedCategory,
         gameCategories: gameCategories,

@@ -43,7 +43,6 @@ const PrivateGroupCreate = ({ route, navigation }) => {
 
       const initialMessage = {
         _id: 1,
-        chatId: newGroupRef.id,
         groupId: newGroupId,
         createdAt: new Date(),
         text: `Welcome to the group "${groupName}"!`,
