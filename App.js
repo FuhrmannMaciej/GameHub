@@ -53,7 +53,7 @@ function HomeStack() {
       <Stack.Screen name="GameCategories" component={GameCategories} />
       <Stack.Screen name="Groups" component={Groups} />
       <Stack.Screen name="CreateNewGroup" component={CreateNewGroup} />
-      <Stack.Screen name="PublicGroupDetails" component={PublicGroupCreate} />
+      <Stack.Screen name="PublicGroupCreate" component={PublicGroupCreate} />
       <Stack.Screen name="PrivateGroupCreate" component={PrivateGroupCreate} />
       <Stack.Screen name="GroupDetails" component={GroupDetails} />
       <Stack.Screen name="GroupChat" component={GroupChat} />
